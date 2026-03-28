@@ -48,29 +48,26 @@ Then in Claude Code, run:
 /run-toolbelt
 ```
 
-### Claude Desktop
+### Claude Desktop / Claude Code
 
-1. Open your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on Mac)
-2. Add the Toolbelt MCP server:
+1. Go to **Settings > Connectors > Add custom connector**
+2. Paste the server URL: `https://mcp.toolbelt.ai/mcp`
+3. Under **Advanced**, set **Client ID** to `toolbelt-mcp`
+4. Sign in with your email when prompted
+
+### Cursor / Windsurf / Other MCP Clients
+
+1. In your Toolbelt namespace, click **Generate MCP URL** to get a token-authenticated URL
+2. Add it to your MCP config:
    ```json
    {
      "mcpServers": {
        "toolbelt": {
-         "url": "<mcpUrl from onboard response>",
-         "headers": {
-           "Authorization": "Bearer <token from onboard response>"
-         }
+         "url": "<your MCP URL>"
        }
      }
    }
    ```
-3. Paste the contents of `run-toolbelt/SKILL.md` as a custom system prompt or skill in your client.
-
-### OpenClaw (or any MCP client)
-
-1. Add the Toolbelt MCP server using your `mcpUrl` as the server URL and `Bearer <token>` as the `Authorization` header.
-2. Paste the contents of `run-toolbelt/SKILL.md` into a custom skill or system prompt slot.
-3. Invoke it when you want to walk through the Toolbelt onboarding flow.
 
 ## Resources
 
