@@ -1,0 +1,47 @@
+{
+  "skill_name": "run-toolbelt",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run the Toolbelt skill. Just check the connection and inspect the current namespace state — no document upload, no question.",
+      "expected_output": "Phases 0, 1, and 2 complete. A structured RESULT block is emitted with a valid namespace_id and phases_run containing [0, 1, 2]. No document_table or answer fields.",
+      "assertions": [
+        "The output contains a RESULT block",
+        "namespace_id is a non-empty UUID",
+        "phases_run includes 0, 1, and 2",
+        "phases_run does NOT include 3, 4, or 5",
+        "No FAILURE block is emitted"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Run the Toolbelt skill with the following document content and question:\n\ndocument_content: \"Acme Corp was founded in 2010 and specializes in industrial widgets. Their flagship product, the Widget Pro 3000, can process 500 units per hour and operates at temperatures between -20°C and 120°C. The company is headquartered in Austin, Texas.\"\ndocument_name: acme-corp-overview\nquestion: What is the Widget Pro 3000's processing capacity?",
+      "expected_output": "All of phases 0, 1, 2, 3, and 5 complete. The RESULT block includes a document_table (the ingested asset), a non-empty answer mentioning '500 units per hour', and sources citing acme-corp-overview.",
+      "assertions": [
+        "The output contains a RESULT block",
+        "No FAILURE block is emitted",
+        "phases_run includes 0, 1, 2, 3, and 5",
+        "phases_run does NOT include 4",
+        "document_table is a non-empty string",
+        "answer is non-empty",
+        "answer references '500' or 'units per hour' or 'processing capacity'",
+        "sources lists at least one entry"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Run the Toolbelt skill with a document from a public URL and a question:\n\ndocument_url: https://www.w3.org/WAI/WCAG21/wcag21.pdf\ndocument_name: wcag-21-spec\nquestion: What are the four principles of WCAG 2.1?",
+      "expected_output": "Phases 0, 1, 2, 3, and 5 complete. The RESULT block includes a document_table for the PDF, a non-empty answer referencing the four WCAG principles (Perceivable, Operable, Understandable, Robust), and at least one source.",
+      "assertions": [
+        "The output contains a RESULT block",
+        "No FAILURE block is emitted",
+        "phases_run includes 0, 1, 2, 3, and 5",
+        "document_table is a non-empty string",
+        "answer is non-empty",
+        "answer references at least one of: Perceivable, Operable, Understandable, Robust",
+        "sources lists at least one entry"
+      ],
+      "notes": "This eval tests URL-based PDF ingestion. The WCAG 2.1 PDF is a stable W3C document. Ingestion may take up to 2 minutes — the skill's polling loop should handle it."
+    }
+  ]
+}

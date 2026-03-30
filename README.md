@@ -30,6 +30,7 @@ Skills follow the [Agent Skills specification](https://agentskills.io/specificat
 | Directory | Slash Command | Description |
 |---|---|---|
 | `run-toolbelt/` | `/run-toolbelt` | Full onboarding walkthrough: add documents, connect Kafka, ask questions |
+| `eval-run-toolbelt/` | `/eval-run-toolbelt` | Runs the run-toolbelt eval suite and emits a graded benchmark report |
 
 ## Installation
 
@@ -41,6 +42,7 @@ git clone https://github.com/toolbeltai/toolbelt-skills
 
 # Symlink the skill directory into Claude Code's skills directory
 ln -s "$(pwd)/toolbelt-skills/run-toolbelt" ~/.claude/skills/run-toolbelt
+ln -s "$(pwd)/toolbelt-skills/eval-run-toolbelt" ~/.claude/skills/eval-run-toolbelt
 ```
 
 Then in Claude Code, run:
