@@ -30,18 +30,18 @@
     },
     {
       "id": 3,
-      "prompt": "Run the Toolbelt skill with a document from a public URL and a question:\n\ndocument_url: https://www.w3.org/WAI/WCAG21/wcag21.pdf\ndocument_name: wcag-21-spec\nquestion: What are the four principles of WCAG 2.1?",
-      "expected_output": "Phases 0, 1, 2, 3, and 5 complete. The RESULT block includes a document_table for the PDF, a non-empty answer referencing the four WCAG principles (Perceivable, Operable, Understandable, Robust), and at least one source.",
+      "prompt": "Run the Toolbelt skill with a document from a public URL and a question:\n\ndocument_url: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf\ndocument_name: nist-fips-197-aes\nquestion: What is the block size used in AES encryption?",
+      "expected_output": "Phases 0, 1, 2, 3, and 5 complete. The RESULT block includes a document_table for the PDF, a non-empty answer referencing the AES block size (128 bits), and at least one source.",
       "assertions": [
         "The output contains a RESULT block",
         "No FAILURE block is emitted",
         "phases_run includes 0, 1, 2, 3, and 5",
         "document_table is a non-empty string",
         "answer is non-empty",
-        "answer references at least one of: Perceivable, Operable, Understandable, Robust",
+        "answer references '128' or 'block size' or 'bits'",
         "sources lists at least one entry"
       ],
-      "notes": "This eval tests URL-based PDF ingestion. The WCAG 2.1 PDF is a stable W3C document. Ingestion may take up to 2 minutes — the skill's polling loop should handle it."
+      "notes": "This eval tests URL-based PDF ingestion. The document is NIST FIPS 197 (AES standard), hosted by the US government — URL is versioned and effectively permanent. Ingestion may take up to 2 minutes — the skill's polling loop should handle it."
     }
   ]
 }
