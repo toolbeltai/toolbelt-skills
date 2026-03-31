@@ -31,6 +31,7 @@ Skills follow the [Agent Skills specification](https://agentskills.io/specificat
 |---|---|---|
 | `run-toolbelt/` | `/run-toolbelt` | Full onboarding walkthrough: add documents, connect Kafka, ask questions |
 | `eval-run-toolbelt/` | `/eval-run-toolbelt` | Runs the run-toolbelt eval suite and emits a graded benchmark report |
+| `geo-analyst/` | `/geo-analyst` | GPU-accelerated geospatial analytics: upload lat/lon data, compute distances, point-in-polygon, and build movement tracks |
 
 ## Installation
 
@@ -43,6 +44,7 @@ git clone https://github.com/toolbeltai/toolbelt-skills
 # Symlink the skill directory into Claude Code's skills directory
 ln -s "$(pwd)/toolbelt-skills/run-toolbelt" ~/.claude/skills/run-toolbelt
 ln -s "$(pwd)/toolbelt-skills/eval-run-toolbelt" ~/.claude/skills/eval-run-toolbelt
+ln -s "$(pwd)/toolbelt-skills/geo-analyst" ~/.claude/skills/geo-analyst
 ```
 
 Then in Claude Code, run:

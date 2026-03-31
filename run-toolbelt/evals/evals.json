@@ -42,6 +42,90 @@
         "sources lists at least one entry"
       ],
       "notes": "This eval tests URL-based PDF ingestion. The document is NIST FIPS 197 (AES standard), hosted by the US government — URL is versioned and effectively permanent. Ingestion may take up to 2 minutes — the skill's polling loop should handle it."
+    },
+    {
+      "id": 4,
+      "tool": "toolbelt_list",
+      "prompt": "Using Toolbelt MCP tools and namespace_id=952b2cd2-747c-4c77-8537-9bb2abd4166b, call toolbelt_list to retrieve all assets in the namespace. Emit a structured RESULT block:\n\nRESULT:\n  namespace_id: <uuid>\n  tool: toolbelt_list\n  asset_count: <number of assets returned>\n  asset_names: [<list of asset name strings>]\n  asset_types: [<list of asset type strings>]\n\nIf the call fails, emit a FAILURE block with the error.",
+      "expected_output": "A RESULT block with namespace_id, asset_count (0 or more), and non-null asset_names and asset_types arrays.",
+      "assertions": [
+        "The output contains a RESULT block",
+        "No FAILURE block is emitted",
+        "namespace_id is 952b2cd2-747c-4c77-8537-9bb2abd4166b",
+        "asset_count is a non-negative integer",
+        "asset_names is present (may be empty array)",
+        "asset_types is present (may be empty array)"
+      ],
+      "notes": "Tests toolbelt_list directly. The namespace may have 0 or more assets — both are valid. The key check is that the tool responds without error."
+    },
+    {
+      "id": 5,
+      "tool": "toolbelt_vectors",
+      "prompt": "Using Toolbelt MCP tools and namespace_id=952b2cd2-747c-4c77-8537-9bb2abd4166b:\n1. First call toolbelt_save to upload a short document:\n   - asset_type: \"document\"\n   - namespace_id: \"952b2cd2-747c-4c77-8537-9bb2abd4166b\"\n   - name: \"vectors-eval-doc\"\n   - file_name: \"document.txt\"\n   - content: \"The Eiffel Tower is located in Paris, France. It was built in 1889 and stands 330 meters tall. It was designed by engineer Gustave Eiffel.\"\n   - content_encoding: \"text\"\n2. Poll toolbelt_jobs every 10 seconds until the semantic job reaches 'completed' (max 3 minutes).\n3. Then call toolbelt_vectors with:\n   - namespace_id: \"952b2cd2-747c-4c77-8537-9bb2abd4166b\"\n   - question: \"How tall is the Eiffel Tower?\"\n4. Emit a RESULT block:\n\nRESULT:\n  namespace_id: <uuid>\n  tool: toolbelt_vectors\n  result_count: <number of results returned>\n  top_result_excerpt: <first ~100 chars of the top result>\n  references_height: <true/false — does any result mention 330 or 'meters' or 'tall'>\n\nIf any step fails, emit a FAILURE block.",
+      "expected_output": "A RESULT block showing at least one vector search result, with references_height: true.",
+      "assertions": [
+        "The output contains a RESULT block",
+        "No FAILURE block is emitted",
+        "result_count is greater than 0",
+        "references_height is true",
+        "top_result_excerpt is non-empty"
+      ],
+      "notes": "Tests toolbelt_vectors (pure semantic similarity search), distinct from toolbelt_search which uses hybrid routing. Uploads a fresh document to ensure searchable content exists."
+    },
+    {
+      "id": 6,
+      "tool": "toolbelt_sql",
+      "prompt": "Using Toolbelt MCP tools and namespace_id=952b2cd2-747c-4c77-8537-9bb2abd4166b:\n1. Call toolbelt_context to retrieve available table schemas.\n2. Pick any relational table from the context (prefer a non-system table). If no relational tables exist, use the query: SELECT 1 AS ping\n3. Call toolbelt_sql with:\n   - namespace_id: \"952b2cd2-747c-4c77-8537-9bb2abd4166b\"\n   - query: \"SELECT 1 AS ping\" (or a simple SELECT from an available table)\n4. Emit a RESULT block:\n\nRESULT:\n  namespace_id: <uuid>\n  tool: toolbelt_sql\n  query_used: <the SQL query executed>\n  row_count: <number of rows returned>\n  columns: [<column names>]\n  error: <error message if any, else null>\n\nIf the tool call itself throws an exception (not just 0 rows), emit a FAILURE block.",
+      "expected_output": "A RESULT block with a successful query execution. row_count >= 1 for SELECT 1, columns includes 'ping' or equivalent.",
+      "assertions": [
+        "The output contains a RESULT block",
+        "No FAILURE block is emitted",
+        "query_used is a non-empty SQL string",
+        "row_count is a non-negative integer",
+        "columns is a non-empty array",
+        "error is null"
+      ],
+      "notes": "Tests toolbelt_sql. Falls back to SELECT 1 if no relational tables exist so the eval is self-contained. toolbelt_execute is an alias for this tool and does not need a separate eval."
+    },
+    {
+      "id": 7,
+      "tool": "toolbelt_describe",
+      "prompt": "Using Toolbelt MCP tools and namespace_id=952b2cd2-747c-4c77-8537-9bb2abd4166b:\n1. Call toolbelt_list to get the list of assets and their table names.\n2. Pick the first asset that has a non-empty table name.\n3. Call toolbelt_describe with:\n   - namespace_id: \"952b2cd2-747c-4c77-8537-9bb2abd4166b\"\n   - table_name: <the table name from step 2>\n4. Emit a RESULT block:\n\nRESULT:\n  namespace_id: <uuid>\n  tool: toolbelt_describe\n  table_name: <the table described>\n  column_count: <number of columns in the schema>\n  has_sample_data: <true/false>\n  row_count: <row count if returned, else null>\n\nIf no assets with table names exist, emit:\nRESULT:\n  namespace_id: <uuid>\n  tool: toolbelt_describe\n  skipped: true\n  reason: \"No tables found in namespace\"\n\nIf the tool throws an error, emit a FAILURE block.",
+      "expected_output": "A RESULT block with schema details for a table, or a skipped result if the namespace has no tables.",
+      "assertions": [
+        "The output contains a RESULT block",
+        "No FAILURE block is emitted",
+        "table_name is non-empty OR skipped is true",
+        "column_count is a positive integer OR skipped is true",
+        "has_sample_data is true or false OR skipped is true"
+      ],
+      "notes": "Tests toolbelt_describe. Gracefully handles empty namespaces by emitting a skipped RESULT rather than failing."
+    },
+    {
+      "id": 8,
+      "tool": "toolbelt_share",
+      "prompt": "Using Toolbelt MCP tools and namespace_id=952b2cd2-747c-4c77-8537-9bb2abd4166b:\n1. Call toolbelt_list to find an existing asset with an asset_id.\n2. Call toolbelt_share with:\n   - namespace_id: \"952b2cd2-747c-4c77-8537-9bb2abd4166b\"\n   - asset_id: <the asset_id from step 1>\n   - expiresInDays: 1\n3. Emit a RESULT block:\n\nRESULT:\n  namespace_id: <uuid>\n  tool: toolbelt_share\n  asset_id: <the asset_id used>\n  share_url: <the URL returned>\n  url_is_non_empty: <true/false>\n\nIf no assets exist, emit:\nRESULT:\n  namespace_id: <uuid>\n  tool: toolbelt_share\n  skipped: true\n  reason: \"No assets in namespace to share\"\n\nIf the tool throws, emit a FAILURE block.",
+      "expected_output": "A RESULT block with a non-empty share_url, or a skipped result if no assets exist.",
+      "assertions": [
+        "The output contains a RESULT block",
+        "No FAILURE block is emitted",
+        "url_is_non_empty is true OR skipped is true",
+        "share_url is a non-empty string OR skipped is true"
+      ],
+      "notes": "Tests toolbelt_share. Requires at least one existing asset — if the namespace is empty after prior evals clean up, this will emit a skipped result rather than fail."
+    },
+    {
+      "id": 9,
+      "tool": "toolbelt_get",
+      "prompt": "Using Toolbelt MCP tools and namespace_id=952b2cd2-747c-4c77-8537-9bb2abd4166b, call toolbelt_get three times with each supported operation type:\n1. toolbelt_get with operation=\"sql\", question=\"how many rows are in the largest table?\", namespace_id=\"952b2cd2-747c-4c77-8537-9bb2abd4166b\"\n2. toolbelt_get with operation=\"vector\", question=\"what documents are about encryption?\", namespace_id=\"952b2cd2-747c-4c77-8537-9bb2abd4166b\"\n3. toolbelt_get with operation=\"graph\", question=\"what relationships exist?\", namespace_id=\"952b2cd2-747c-4c77-8537-9bb2abd4166b\"\n\nEmit a RESULT block:\n\nRESULT:\n  namespace_id: <uuid>\n  tool: toolbelt_get\n  sql_context_non_empty: <true/false>\n  vector_context_non_empty: <true/false>\n  graph_context_non_empty: <true/false>\n  errors: [<any operation types that threw errors>]\n\nIf all three calls throw errors, emit a FAILURE block.",
+      "expected_output": "A RESULT block where at least one of sql_context_non_empty, vector_context_non_empty, or graph_context_non_empty is true.",
+      "assertions": [
+        "The output contains a RESULT block",
+        "No FAILURE block is emitted",
+        "At least one of sql_context_non_empty, vector_context_non_empty, or graph_context_non_empty is true",
+        "errors array is present (may be empty)"
+      ],
+      "notes": "Tests toolbelt_get across all three operation types. Some context types may be empty if the namespace has no relational tables or graph data — that is acceptable as long as the tool responds without error."
     }
   ]
 }

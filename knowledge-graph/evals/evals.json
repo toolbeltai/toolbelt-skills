@@ -1,0 +1,16 @@
+{
+  "skill_name": "knowledge-graph",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run knowledge-graph with default sample document.",
+      "expected_output": "All phases complete. A RESULT block is emitted with entity_count > 0, relationship_count > 0, and a non-empty cypher_results rows array.",
+      "assertions": [
+        "RESULT block emitted",
+        "entity_count is greater than 0",
+        "relationship_count is greater than 0",
+        "cypher_results is non-empty"
+      ]
+    }
+  ]
+}
