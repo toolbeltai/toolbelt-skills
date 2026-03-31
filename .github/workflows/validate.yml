@@ -1,0 +1,30 @@
+name: Validate Skills
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Validate SKILL.md files
+        run: uv run --with pyyaml python .github/scripts/validate_skills.py
+
+      - name: Validate evals.json files
+        run: uv run python .github/scripts/validate_evals.py
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install markdownlint
+        run: npm install -g markdownlint-cli
+
+      - name: Lint markdown
+        run: markdownlint '**/*.md' --ignore node_modules

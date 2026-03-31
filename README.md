@@ -1,81 +1,33 @@
 # toolbelt-skills
 
-Skill files for using [Toolbelt](https://toolbelt.ai) through any MCP-capable AI agent (Claude Code, Claude Desktop, OpenClaw, and others).
+> Give your AI agent a GPU-accelerated data workspace — SQL, vectors, graphs, geospatial, and streaming — in 10 seconds.
 
-## What is Toolbelt?
+![demo](assets/run-toolbelt-demo.gif)
 
-Toolbelt gives AI agents intelligent data tools — semantic search, SQL execution, document ingestion, streaming data connections, and knowledge graph traversal — all exposed over the Model Context Protocol (MCP).
+## Quick Start
 
-Get started at https://toolbelt.ai — no sign-up required, credentials provisioned in seconds.
+```bash
+curl -X POST https://toolbelt.ai/api/onboard | jq .mcpUrl
+```
 
-## Prerequisites
-
-1. **A Toolbelt account** — provision instantly:
-   ```bash
-   curl --request POST \
-     --url https://toolbelt.ai/api/onboard \
-     --header 'content-type: application/json' \
-     --data '{}'
-   ```
-   Or visit https://toolbelt.ai and click **Try Now**.
-
-2. **Your MCP client configured** with the `mcpUrl` and `token` from the response above.
-
-> Trial instances expire after 72 hours. Visit https://toolbelt.ai with your token to claim a permanent account.
-
-Skills follow the [Agent Skills specification](https://agentskills.io/specification) — each skill is a directory containing a `SKILL.md` file.
+Paste the MCP URL into your agent. That's it.
 
 ## Skills
 
-| Directory | Slash Command | Description |
-|---|---|---|
-| `run-toolbelt/` | `/run-toolbelt` | Full onboarding walkthrough: add documents, connect Kafka, ask questions |
-| `eval-run-toolbelt/` | `/eval-run-toolbelt` | Runs the run-toolbelt eval suite and emits a graded benchmark report |
-| `geo-analyst/` | `/geo-analyst` | GPU-accelerated geospatial analytics: upload lat/lon data, compute distances, point-in-polygon, and build movement tracks |
+| Skill | Command | What It Does |
+|-------|---------|-------------|
+| [run-toolbelt](run-toolbelt/) | `/run-toolbelt` | Onboard, upload docs, connect data, ask questions |
+| [geo-analyst](geo-analyst/) | `/geo-analyst` | GPU-accelerated geospatial analytics — spatial queries and map rendering |
+| [knowledge-graph](knowledge-graph/) | `/knowledge-graph` | Auto-extract entities from docs, explore connections with Cypher |
+| [multi-agent-workspace](multi-agent-workspace/) | `/multi-agent-workspace` | Create a shared workspace, generate a shareable MCP URL, demo multi-agent collaboration |
+| [sql-analyst](sql-analyst/) | `/sql-analyst` | Upload a CSV, ask questions in plain English, get SQL + results |
+| [streaming-analyst](streaming-analyst/) | `/streaming-analyst` | Connect a Kafka topic, watch data arrive, run aggregations, detect anomalies |
+| [eval-run-toolbelt](eval-run-toolbelt/) | `/eval-run-toolbelt` | Run the eval suite and emit a graded benchmark report |
 
-## Installation
+## Works With
 
-### Claude Code
+Claude Code · OpenClaw · Cursor · Gemini CLI · Codex CLI · Windsurf · any MCP client
 
-```bash
-# Clone this repo
-git clone https://github.com/toolbeltai/toolbelt-skills
+## Docs
 
-# Symlink the skill directory into Claude Code's skills directory
-ln -s "$(pwd)/toolbelt-skills/run-toolbelt" ~/.claude/skills/run-toolbelt
-ln -s "$(pwd)/toolbelt-skills/eval-run-toolbelt" ~/.claude/skills/eval-run-toolbelt
-ln -s "$(pwd)/toolbelt-skills/geo-analyst" ~/.claude/skills/geo-analyst
-```
-
-Then in Claude Code, run:
-```
-/run-toolbelt
-```
-
-### Claude Desktop / Claude Code
-
-1. Go to **Settings > Connectors > Add custom connector**
-2. Paste the server URL: `https://mcp.toolbelt.ai/mcp`
-3. Under **Advanced**, set **Client ID** to `toolbelt-mcp`
-4. Sign in with your email when prompted
-
-### Cursor / Windsurf / Other MCP Clients
-
-1. In your Toolbelt namespace, click **Generate MCP URL** to get a token-authenticated URL
-2. Add it to your MCP config:
-   ```json
-   {
-     "mcpServers": {
-       "toolbelt": {
-         "url": "<your MCP URL>"
-       }
-     }
-   }
-   ```
-
-## Resources
-
-- **Docs:** https://docs.toolbelt.ai
-- **GitHub:** https://github.com/toolbeltai
-- **Discord:** https://discord.gg/toolbelt
-- **Website:** https://toolbelt.ai
+https://docs.toolbelt.ai

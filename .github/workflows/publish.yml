@@ -1,0 +1,41 @@
+name: Publish Skills
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install CLI tools
+        run: |
+          npm install -g clawhub
+          npm install -g @smithery/cli
+
+      - name: Publish skills to ClawHub
+        run: |
+          failed=0
+          for dir in */; do
+            dir="${dir%/}"
+            if [ -f "$dir/SKILL.md" ]; then
+              echo "Publishing $dir..."
+              if (cd "$dir" && clawhub publish); then
+                echo "✓ $dir published to ClawHub"
+              else
+                echo "✗ $dir failed on ClawHub"
+                failed=1
+              fi
+            fi
+          done
+          exit $failed
+
+      - name: Publish MCP server to Smithery
+        run: smithery mcp publish "https://mcp.toolbelt.ai/mcp" -n toolbeltai/toolbelt
