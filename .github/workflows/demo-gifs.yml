@@ -22,7 +22,7 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y ffmpeg unzip
           curl -fL "https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64" -o /tmp/ttyd
-          sudo install /tmp/ttyd /usr/bin/ttyd 
+          sudo install /tmp/ttyd /usr/bin/ttyd
 
       - name: Install JetBrainsMono font
         run: |
@@ -41,7 +41,7 @@ jobs:
           sudo chmod +x /run-toolbelt /geo-analyst
 
       - name: Generate GIFs
-        run: ~/go/bin/vhs run-toolbelt-demo.tape && ~/go/bin/vhs geo-analyst-demo.tape
+        run: ~/go/bin/vhs run-toolbelt-demo.tape && ~/go/bin/vhs geo-analyst-demo.tape && ~/go/bin/vhs signup.tape
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         env:
