@@ -14,13 +14,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: charmbracelet/vhs-action@v1
+      - uses: actions/setup-go@v5
         with:
-          path: run-toolbelt-demo.tape
+          go-version: "1.22"
 
-      - uses: charmbracelet/vhs-action@v1
-        with:
-          path: geo-analyst-demo.tape
+      - name: Install ffmpeg and ttyd
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg ttyd
+
+      - name: Install vhs
+        run: go install github.com/charmbracelet/vhs@latest
+
+      - name: Generate GIFs
+        run: ~/go/bin/vhs run-toolbelt-demo.tape && ~/go/bin/vhs geo-analyst-demo.tape
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         env:
