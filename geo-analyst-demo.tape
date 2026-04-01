@@ -1,7 +1,7 @@
 Output assets/geo-analyst-demo.gif
 
-Set Width 1260
-Set Height 800
+Set Width 1440
+Set Height 912
 Set FontSize 16
 Set Theme "Dracula"
 

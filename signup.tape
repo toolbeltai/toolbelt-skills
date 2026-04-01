@@ -1,8 +1,8 @@
 Output assets/signup-demo.gif
 
-Set Width 400
-Set Height 400
-Set FontSize 14
+Set Width 1440
+Set Height 320
+Set FontSize 16
 Set Theme "Dracula"
 
 Sleep 500ms
