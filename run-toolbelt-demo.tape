@@ -1,7 +1,7 @@
 Output assets/run-toolbelt-demo.gif
 
-Set Width 120
-Set Height 120
+Set Width 1260
+Set Height 800
 Set FontSize 14
 Set Theme "Dracula"
 
