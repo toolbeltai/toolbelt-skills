@@ -39,6 +39,9 @@ jobs:
           sudo cp assets/demos/run-toolbelt-demo.sh /run-toolbelt
           sudo cp assets/demos/geo-analyst-demo.sh /geo-analyst
           sudo chmod +x /run-toolbelt /geo-analyst
+          sudo mkdir -p /usr/local/fake-bin
+          sudo cp assets/demos/fake-curl.sh /usr/local/fake-bin/curl
+          sudo chmod +x /usr/local/fake-bin/curl
 
       - name: Generate GIFs
         run: ~/go/bin/vhs run-toolbelt-demo.tape && ~/go/bin/vhs geo-analyst-demo.tape && ~/go/bin/vhs signup.tape

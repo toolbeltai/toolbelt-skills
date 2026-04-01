@@ -1,12 +1,12 @@
 Output assets/signup-demo.gif
 
-Set Width 1440
-Set Height 320
-Set FontSize 16
+Set Width 1800
+Set Height 400
+Set FontSize 20
 Set Theme "Dracula"
 
 Hide
-Type "curl() { sleep 1 && echo '{\"mcpUrl\": \"https://mcp.toolbelt.ai/t/tb_1234567890/8bf91bad-02df-4137-97ac-69a006bac193/mcp\"}'; }"
+Type "export PATH=/usr/local/fake-bin:$PATH"
 Enter
 Show
 
