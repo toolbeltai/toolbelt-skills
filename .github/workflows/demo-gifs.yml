@@ -19,7 +19,14 @@ jobs:
           go-version: "1.22"
 
       - name: Install ffmpeg and ttyd
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg ttyd
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg ttyd unzip
+
+      - name: Install JetBrainsMono font
+        run: |
+          mkdir -p ~/.local/share/fonts
+          curl -fL "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/JetBrainsMono.zip" -o /tmp/JetBrainsMono.zip
+          unzip -o -q /tmp/JetBrainsMono.zip -d ~/.local/share/fonts/
+          fc-cache -fv
 
       - name: Install vhs
         run: go install github.com/charmbracelet/vhs@latest
