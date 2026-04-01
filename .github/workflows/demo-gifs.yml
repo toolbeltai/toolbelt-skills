@@ -19,7 +19,10 @@ jobs:
           go-version: "1.22"
 
       - name: Install ffmpeg and ttyd
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg ttyd unzip
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg unzip
+          curl -fL "https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64" -o /tmp/ttyd
+          sudo install /tmp/ttyd /usr/local/bin/ttyd
 
       - name: Install JetBrainsMono font
         run: |
