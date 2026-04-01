@@ -2,7 +2,9 @@
 
 > Give your AI agent a GPU-accelerated data workspace — SQL, vectors, graphs, geospatial, and streaming — in 10 seconds.
 
-![demo](assets/run-toolbelt-demo.gif)
+![run-toolbelt demo](assets/run-toolbelt-demo.gif)
+
+![geo-analyst demo](assets/geo-analyst-demo.gif)
 
 ## Quick Start
 
