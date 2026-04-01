@@ -14,16 +14,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install ffmpeg
-        run: sudo apt-get install -y ffmpeg
-
-      - uses: charmbracelet/vhs-action@v2
+      - uses: charmbracelet/vhs-action@v1
         with:
-          path: |
-            run-toolbelt-demo.tape
-            geo-analyst-demo.tape
+          path: run-toolbelt-demo.tape
+
+      - uses: charmbracelet/vhs-action@v1
+        with:
+          path: geo-analyst-demo.tape
 
       - uses: stefanzweifel/git-auto-commit-action@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           commit_message: "chore: regenerate demo GIFs [skip ci]"
+          commit_user_name: vhs-action
+          commit_user_email: actions@github.com
+          commit_author: vhs-action <actions@github.com>
           file_pattern: "assets/*.gif"
