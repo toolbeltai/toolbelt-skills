@@ -1,5 +1,7 @@
 # run-toolbelt
 
+![run-toolbelt demo](../assets/run-toolbelt-demo.gif)
+
 Autonomous end-to-end Toolbelt agent. Provisions a namespace, ingests documents, connects streaming data sources, and answers questions — all without human interaction.
 
 Invoke via `/run-toolbelt` in Claude Code, or via the `Skill` tool in any MCP-capable agent.
