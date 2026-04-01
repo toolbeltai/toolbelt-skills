@@ -44,7 +44,7 @@ jobs:
           sudo chmod +x /usr/local/fake-bin/curl
 
       - name: Generate GIFs
-        run: ~/go/bin/vhs run-toolbelt-demo.tape && ~/go/bin/vhs geo-analyst-demo.tape && ~/go/bin/vhs signup.tape
+        run: ~/go/bin/vhs run-toolbelt-demo.tape && ~/go/bin/vhs geo-analyst-demo.tape && PATH=/usr/local/fake-bin:$PATH ~/go/bin/vhs signup.tape
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         env:
