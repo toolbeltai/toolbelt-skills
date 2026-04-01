@@ -14,9 +14,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install ffmpeg
+        run: sudo apt-get install -y ffmpeg
+
       - uses: charmbracelet/vhs-action@v2
         with:
-          path: "*.tape"
+          path: |
+            run-toolbelt-demo.tape
+            geo-analyst-demo.tape
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
