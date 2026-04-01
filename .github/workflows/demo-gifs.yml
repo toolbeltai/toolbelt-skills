@@ -21,8 +21,9 @@ jobs:
       - name: Install ffmpeg and ttyd
         run: |
           sudo apt-get update && sudo apt-get install -y ffmpeg unzip
+          sudo apt-get remove -y ttyd || true
           curl -fL "https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64" -o /tmp/ttyd
-          sudo install /tmp/ttyd /usr/local/bin/ttyd
+          sudo install /tmp/ttyd /usr/bin/ttyd
 
       - name: Install JetBrainsMono font
         run: |
