@@ -6,5 +6,6 @@ Set FontSize 14
 Set Theme "Dracula"
 
 Sleep 500ms
-Exec bash assets/demos/run-toolbelt-demo.sh
+Type "/run-toolbelt"
+Enter
 Sleep 14s

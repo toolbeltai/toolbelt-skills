@@ -34,6 +34,12 @@ jobs:
       - name: Install vhs
         run: go install github.com/charmbracelet/vhs@latest
 
+      - name: Install skill scripts
+        run: |
+          sudo cp assets/demos/run-toolbelt-demo.sh /run-toolbelt
+          sudo cp assets/demos/geo-analyst-demo.sh /geo-analyst
+          sudo chmod +x /run-toolbelt /geo-analyst
+
       - name: Generate GIFs
         run: ~/go/bin/vhs run-toolbelt-demo.tape && ~/go/bin/vhs geo-analyst-demo.tape
 

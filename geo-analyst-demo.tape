@@ -6,5 +6,6 @@ Set FontSize 14
 Set Theme "Dracula"
 
 Sleep 500ms
-Exec bash assets/demos/geo-analyst-demo.sh
+Type "/geo-analyst"
+Enter
 Sleep 14s
