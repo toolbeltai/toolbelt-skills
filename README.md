@@ -23,6 +23,7 @@ Paste the MCP URL into your agent. That's it.
 | [sql-analyst](sql-analyst/)                     | `/sql-analyst`           | Upload a CSV, ask questions in plain English, get SQL + results                         |
 | [streaming-analyst](streaming-analyst/)         | `/streaming-analyst`     | Connect a Kafka topic, watch data arrive, run aggregations, detect anomalies            |
 | [vector-search](vector-search/)                 | `/vector-search`         | Upload a document, retrieve semantically similar passages — no keyword matching needed  |
+| [data-blend](data-blend/)                       | `/data-blend`            | Upload multiple tables and run cross-table JOIN queries to combine datasets             |
 | [eval-run-toolbelt](eval-run-toolbelt/)         | `/eval-run-toolbelt`     | Run the eval suite and emit a graded benchmark report                                   |
 
 ## Works With
