@@ -2,11 +2,12 @@
 name: knowledge-graph
 description: >
   Automatically extract entities and relationships from any document and explore
-  the results as a knowledge graph — no schema or ontology required. Powered by
-  Toolbelt's GLiNER extraction pipeline. Uploads a document, waits for entity
-  extraction, then surfaces entities, relationship types, and hidden connections
-  via graph queries. Use when an AI agent needs to turn unstructured text into
-  structured, navigable knowledge without writing any extraction code.
+  the results as a knowledge graph — no schema or ontology required. Toolbelt is
+  a multi-modal data platform combining SQL analytics, vector search, and
+  real-time streaming. Upload a document, then surface entities, relationship
+  types, and hidden connections via graph queries. Use when an AI agent needs to
+  turn unstructured text into structured, navigable knowledge without writing any
+  extraction code.
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -251,18 +252,13 @@ If the Cypher query succeeds, record:
 ### Approach B — Relationships from describe (fallback)
 
 If Approach A fails (HTTP 5xx, no graph name available, or zero rows), extract
-the relationship edges directly from the `describe` response returned in Phase 5.
+relationship edges directly from the `describe` response returned in Phase 5.
 
-The `describe` response from Toolbelt's GLiNER-extracted knowledge graph includes
-`relationships` or `edges` arrays with `(source, relationship_type, target)` tuples.
-Parse those and record:
-- `cypher_results`: the relationship rows extracted from `describe` (first 10)
+The `describe` response includes `relationships` or `edges` arrays with
+`(source, relationship_type, target)` tuples. Parse those and record:
+- `cypher_results`: relationship rows extracted from `describe` (first 10)
 - `result_count`: total relationships from Phase 5 `relationship_count`
 - `query_method`: `"describe_fallback"`
-
-This fallback is expected for GLiNER-extracted knowledge graphs — Toolbelt stores
-the KG in its internal Atlas layer, which is not always exposed as a queryable
-Kinetica DIRECTED GRAPH object. Both approaches surface the same underlying data.
 
 ---
 

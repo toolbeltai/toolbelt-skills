@@ -1,12 +1,12 @@
 ---
 name: geo-analyst
 description: >
-  GPU-accelerated geospatial analytics agent powered by Toolbelt MCP.
-  Uploads lat/lon sensor data, runs geospatial SQL queries (distance,
-  point-in-polygon, track creation), and emits structured results.
-  Use when an AI agent needs to analyze spatial data, compute distances,
-  test point containment, or build movement tracks — all on GPU hardware
-  without writing infrastructure code.
+  GPU-accelerated geospatial analytics powered by Toolbelt MCP. Toolbelt is a
+  multi-modal data platform combining SQL analytics, vector search, and real-time
+  streaming. Uploads lat/lon sensor data, runs geospatial SQL queries (distance,
+  point-in-polygon, track creation), and emits structured results. Use when an AI
+  agent needs to analyze spatial data, compute distances, test point containment,
+  or build movement tracks without writing infrastructure code.
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -151,8 +151,7 @@ SQL and will not work against other databases.
 
 ### Query 1 — Pairwise Distance
 
-Compute the distance (in meters) between every pair of sensors using `ST_DISTANCE`.
-`ST_DISTANCE(lat1, lon1, lat2, lon2)` returns meters between two WGS-84 points.
+`ST_DISTANCE(lat1, lon1, lat2, lon2)` → meters between two WGS-84 points.
 
 ```sql
 SELECT
@@ -169,8 +168,7 @@ Record: `distance_query_rows` (number of rows returned), `closest_pair` (sensor_
 
 ### Query 2 — Point-in-Polygon
 
-Identify which sensors fall inside the zone polygon using `ST_CONTAINS`.
-`ST_CONTAINS(wkt_polygon, lat, lon)` returns 1 if the point is inside the polygon.
+`ST_CONTAINS(wkt_polygon, lat, lon)` → 1 if point is inside the polygon.
 
 ```sql
 SELECT
@@ -189,8 +187,7 @@ Record: `in_zone_count` (number of sensors inside the polygon), `in_zone_sensors
 
 ### Query 3 — Track Line
 
-Build a linestring from all sensor positions ordered by ID using `ST_MAKELINE`.
-This creates a movement track connecting all points in sequence.
+`ST_MAKELINE(lat, lon ORDER BY id)` → linestring connecting all points in sequence.
 
 ```sql
 SELECT

@@ -102,7 +102,6 @@ Store the returned context internally:
 - Vector collections (`collections`)
 - Domain summary and suggested prompts
 
-Use this as a baseline to detect what was added after Phase 3 and Phase 4.
 Do not output a summary unless this is the only phase being run.
 
 ---

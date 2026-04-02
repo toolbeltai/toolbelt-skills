@@ -1,10 +1,11 @@
 ---
 name: sql-analyst
 description: >
-  Text-to-SQL analyst powered by Toolbelt MCP. Uploads a CSV, auto-generates
-  schema context, then answers natural language questions about the data by
-  generating and executing SQL. Use when an AI agent needs to analyze tabular
-  data without writing queries manually — upload, ask, get answers.
+  Text-to-SQL analyst powered by Toolbelt MCP. Toolbelt is a multi-modal data
+  platform combining SQL analytics, vector search, and real-time streaming.
+  Uploads a CSV, auto-generates schema context, then answers natural language
+  questions by generating and executing SQL. Use when an AI agent needs to analyze
+  tabular data without writing queries manually — upload, ask, get answers.
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -158,9 +159,6 @@ the table name returned from the save call). Record:
 - `table_name`: the SQL table name for this asset
 - `column_names`: list of columns in the table
 - `row_count`: number of rows if provided in context
-
-This confirms the data is queryable and provides the schema that `toolbelt_search`
-will use to generate SQL.
 
 ---
 

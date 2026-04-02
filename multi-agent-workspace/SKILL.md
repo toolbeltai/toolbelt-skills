@@ -1,11 +1,12 @@
 ---
 name: multi-agent-workspace
 description: >
-  Set up a shared Toolbelt workspace for multi-agent collaboration. Uploads a
-  document to a namespace, generates a shareable asset URL, and emits ready-to-use
-  connection instructions for a second agent to join the same workspace and query
-  the same data. Use when two or more agents need to share data, or when handing
-  off context between agent sessions without duplicating ingestion work.
+  Set up a shared Toolbelt workspace for multi-agent collaboration. Toolbelt is a
+  multi-modal data platform combining SQL analytics, vector search, and real-time
+  streaming. Uploads a document to a namespace, generates a shareable asset URL,
+  and emits connection instructions for a second agent to join the same workspace.
+  Use when two or more agents need to share data, or when handing off context
+  between sessions without duplicating ingestion work.
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -140,7 +141,7 @@ Record the returned `asset_id` — it is required for `toolbelt_share` in Phase 
 
 Call `toolbelt_jobs` with `{ "namespace_id": "<namespace_id>" }` every 10 seconds.
 
-Wait for the `ingest` job to reach `completed`. Maximum wait: 3 minutes.
+Wait for the `ingest` job to reach `completed`. Typical duration: 15–60 seconds. Maximum wait: 3 minutes.
 
 If the job reaches `failed` or the timeout elapses, emit structured failure and halt:
 ```
