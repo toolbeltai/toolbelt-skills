@@ -1,12 +1,12 @@
 ---
 name: knowledge-graph
 description: >
-  Automatic knowledge graph extraction and exploration via GLiNER + Cypher.
-  Uploads a document, waits for entity extraction to complete, then explores
-  the resulting knowledge graph — finding entities, relationships, and hidden
-  connections the user didn't know about. Zero schema design required.
-  Use when an AI agent needs to extract structured knowledge from unstructured
-  text and explore it as a graph without any upfront ontology or configuration.
+  Automatically extract entities and relationships from any document and explore
+  the results as a knowledge graph — no schema or ontology required. Powered by
+  Toolbelt's GLiNER extraction pipeline. Uploads a document, waits for entity
+  extraction, then surfaces entities, relationship types, and hidden connections
+  via graph queries. Use when an AI agent needs to turn unstructured text into
+  structured, navigable knowledge without writing any extraction code.
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -16,11 +16,20 @@ compatibility: >
 metadata:
   author: toolbeltai
   version: "1.0"
+  openclaw:
+    emoji: "🕸️"
+    homepage: "https://toolbelt.ai/docs/knowledge-graph"
+    skillKey: "knowledge-graph"
 ---
 
 Extract a knowledge graph from a document and explore it autonomously using
 Toolbelt MCP tools. Work through each phase in order without prompting for
 user input. On unrecoverable error, emit a structured failure and halt.
+
+## When Not To Use
+
+- For structured tabular data (CSV, SQL tables) — use `sql-analyst` instead.
+- When entity and relationship extraction is not needed — use `sql-analyst` or `streaming-analyst` for the appropriate data type.
 
 ## Invocation Parameters
 

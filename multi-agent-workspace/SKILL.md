@@ -1,11 +1,11 @@
 ---
 name: multi-agent-workspace
 description: >
-  Multi-agent collaboration demo via Toolbelt MCP. Uploads a shared document,
-  generates a shareable asset URL, and emits connection instructions for a
-  second agent to join the same namespace and query the same data. Demonstrates
-  the collaboration story — two agents, one workspace — without requiring a
-  second live MCP session.
+  Set up a shared Toolbelt workspace for multi-agent collaboration. Uploads a
+  document to a namespace, generates a shareable asset URL, and emits ready-to-use
+  connection instructions for a second agent to join the same workspace and query
+  the same data. Use when two or more agents need to share data, or when handing
+  off context between agent sessions without duplicating ingestion work.
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -15,11 +15,20 @@ compatibility: >
 metadata:
   author: toolbeltai
   version: "1.0"
+  openclaw:
+    emoji: "🤝"
+    homepage: "https://toolbelt.ai/docs/multi-agent"
+    skillKey: "multi-agent-workspace"
 ---
 
-Set up a shared workspace and generate collaboration artifacts using Toolbelt
-MCP tools. Work through each phase in order without prompting for user input.
-On unrecoverable error, emit a structured failure and halt.
+Set up a shared Toolbelt workspace and generate collaboration artifacts for a
+second agent using Toolbelt MCP tools. Work through each phase in order without
+prompting for user input. On unrecoverable error, emit a structured failure and halt.
+
+## When Not To Use
+
+- For single-agent workflows where data sharing between agents is not needed.
+- When you only need to analyze data yourself — use `sql-analyst`, `streaming-analyst`, or `knowledge-graph` instead.
 
 ## Invocation Parameters
 

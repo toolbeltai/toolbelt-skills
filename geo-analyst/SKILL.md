@@ -16,12 +16,21 @@ compatibility: >
 metadata:
   author: toolbeltai
   version: "1.0"
+  openclaw:
+    emoji: "🌍"
+    homepage: "https://toolbelt.ai/docs/geospatial"
+    skillKey: "geo-analyst"
 ---
 
 Execute GPU-accelerated geospatial analytics end-to-end using Toolbelt MCP tools.
 Work through each phase in order. Extract all required inputs from task parameters
 or invocation context — do not prompt for user input. Progress through phases
 without confirmation. On unrecoverable error, emit a structured failure and halt.
+
+## When Not To Use
+
+- For tabular data without lat/lon coordinates — use `sql-analyst` instead.
+- For unstructured text or documents — use `knowledge-graph` instead.
 
 ## Invocation Parameters
 
@@ -106,7 +115,8 @@ Upload the CSV as a relational asset using `toolbelt_save`:
   "name": "<asset_name or 'sensor-locations'>",
   "file_name": "sensor-locations.csv",
   "content": "<csv_content or default sample data above>",
-  "content_encoding": "text"
+  "content_encoding": "text",
+  "data_format": "csv"
 }
 ```
 
@@ -134,6 +144,10 @@ uploaded asset. Store it as `sensor_table` for use in Phase 3.
 
 Run all three queries using `toolbelt_execute`. Pass `namespace_id` and `query`
 for each call. Collect results.
+
+**Note:** `ST_DISTANCE`, `ST_CONTAINS`, and `ST_MAKELINE` are Kinetica-native geospatial
+functions available through Toolbelt's GPU-accelerated query engine. They are not standard
+SQL and will not work against other databases.
 
 ### Query 1 — Pairwise Distance
 

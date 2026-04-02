@@ -14,11 +14,21 @@ compatibility: >
 metadata:
   author: toolbeltai
   version: "1.0"
+  openclaw:
+    emoji: "📊"
+    homepage: "https://toolbelt.ai/docs/sql"
+    skillKey: "sql-analyst"
 ---
 
 Upload tabular data and answer natural language questions about it using
 Toolbelt MCP tools. Work through each phase in order without prompting for
 user input. On unrecoverable error, emit a structured failure and halt.
+
+## When Not To Use
+
+- For unstructured text or documents — use `knowledge-graph` to extract entities and relationships.
+- For real-time or streaming data — use `streaming-analyst` instead.
+- For spatial data with lat/lon coordinates — use `geo-analyst` instead.
 
 ## Invocation Parameters
 

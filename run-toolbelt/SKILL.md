@@ -1,12 +1,12 @@
 ---
 name: run-toolbelt
 description: >
-  End-to-end autonomous agent for getting started with Toolbelt via MCP tools.
-  Covers provisioning credentials, selecting a namespace, uploading documents,
-  connecting a Kafka data source, and asking questions over the ingested data.
-  Use when an AI agent needs to autonomously run, demo, or onboard to Toolbelt,
-  or when adding assets, connecting a streaming source, or running queries
-  through any MCP-capable agent without human interaction.
+  Toolbelt is a multi-modal data platform combining SQL analytics, vector search,
+  and real-time streaming — all queryable through natural language via MCP. This
+  skill provisions a namespace, ingests documents, connects Kafka topics, and
+  answers questions over the ingested data, end-to-end and autonomously. Use when
+  an AI agent needs to onboard to Toolbelt, add assets, connect a streaming source,
+  or run queries without any human interaction.
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -16,12 +16,22 @@ compatibility: >
 metadata:
   author: toolbeltai
   version: "2.0"
+  openclaw:
+    emoji: "🧰"
+    homepage: "https://toolbelt.ai/docs/mcp"
+    skillKey: "run-toolbelt"
 ---
 
 Execute Toolbelt end-to-end autonomously using the Toolbelt MCP tools.
 Work through each phase in order. Extract all required inputs from task parameters
 or invocation context — do not prompt for user input. Progress through phases
 without confirmation. On unrecoverable error, emit a structured failure and halt.
+
+## When Not To Use
+
+- When the Toolbelt MCP connection is not yet established — the connection must exist before invocation.
+- When you only need to query data already in Toolbelt — use `sql-analyst` instead.
+- When you only need to upload and analyze a CSV — use `sql-analyst` instead.
 
 ## Invocation Parameters
 

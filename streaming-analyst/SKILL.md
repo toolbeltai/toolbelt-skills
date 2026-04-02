@@ -17,12 +17,21 @@ compatibility: >
 metadata:
   author: toolbeltai
   version: "1.0"
+  openclaw:
+    emoji: "📡"
+    homepage: "https://toolbelt.ai/docs/streaming"
+    skillKey: "streaming-analyst"
 ---
 
 Connect a Kafka topic (or simulate one) and run real-time aggregation and
 anomaly detection using Toolbelt MCP tools. Work through each phase in order
 without prompting for user input. On unrecoverable error, emit a structured
 failure and halt.
+
+## When Not To Use
+
+- For static batch tabular data — use `sql-analyst` instead.
+- When real-time monitoring, windowed aggregation, or anomaly detection is not the goal.
 
 ## Invocation Parameters
 
