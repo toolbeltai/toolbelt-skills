@@ -106,11 +106,11 @@ Store the resolved `namespace_id` — pass it to every subsequent tool call.
 
 ## Phase 2: Upload Sensor Data
 
-Upload the CSV as a relational asset using `toolbelt_save`:
+Upload the CSV as a document using `toolbelt_save`:
 
 ```json
 {
-  "asset_type": "relational",
+  "asset_type": "document",
   "namespace_id": "<namespace_id>",
   "name": "<asset_name or 'sensor-locations'>",
   "file_name": "sensor-locations.csv",
@@ -124,8 +124,7 @@ Upload the CSV as a relational asset using `toolbelt_save`:
 
 Call `toolbelt_jobs` with `{ "namespace_id": "<namespace_id>" }` every 10 seconds.
 
-Wait for the `ingest` job to reach `completed`. Relational assets do not require
-a `semantic` job — only `ingest` must complete.
+Wait for the `ingest` job to reach `completed`.
 
 Typical duration: 15–60 seconds. Maximum wait: 3 minutes.
 

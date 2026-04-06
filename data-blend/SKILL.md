@@ -159,7 +159,7 @@ For each table that does not already exist, call `toolbelt_save`:
 
 ```json
 {
-  "asset_type": "relational",
+  "asset_type": "document",
   "namespace_id": "<namespace_id>",
   "name": "<table_a_name or table_b_name>",
   "file_name": "<name>.csv",

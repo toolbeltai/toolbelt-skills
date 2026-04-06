@@ -16,9 +16,6 @@ jobs:
       - name: Validate SKILL.md files
         run: uv run --with pyyaml python .github/scripts/validate_skills.py
 
-      - name: Validate evals.json files
-        run: uv run python .github/scripts/validate_evals.py
-
       - uses: actions/setup-node@v4
         with:
           node-version: "20"

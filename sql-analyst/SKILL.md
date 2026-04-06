@@ -119,7 +119,7 @@ Call `toolbelt_save`:
 
 ```json
 {
-  "asset_type": "relational",
+  "asset_type": "document",
   "namespace_id": "<namespace_id>",
   "name": "<asset_name>",
   "file_name": "<asset_name>.csv",
@@ -137,8 +137,7 @@ Record the returned `asset_id`.
 
 Call `toolbelt_jobs` with `{ "namespace_id": "<namespace_id>" }` every 10 seconds.
 
-Wait for the `ingest` job for this asset to reach `completed`. Relational assets
-do not require a `semantic` job — only `ingest` must complete.
+Wait for the `ingest` job for this asset to reach `completed`.
 
 Typical duration: 15–60 seconds. Maximum wait: 3 minutes.
 
@@ -226,7 +225,7 @@ RESULT:
 |---|---|
 | 0. Verify connection | `get_semantic_names` |
 | 1. Resolve namespace | (from Phase 0 result) |
-| 2. Upload CSV | `toolbelt_save` |
+| 2. Upload CSV document | `toolbelt_save` |
 | 3. Poll for ingestion | `toolbelt_jobs` |
 | 4. Get schema context | `toolbelt_context` |
 | 5. Ask question | `toolbelt_search`, `toolbelt_sql` (fallback) |

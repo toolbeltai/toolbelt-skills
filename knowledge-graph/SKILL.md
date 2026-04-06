@@ -181,20 +181,33 @@ runs and populates entity nodes and relationship edges.
 
 ---
 
-## Phase 4: Confirm Knowledge Graph Exists
+## Phase 4: Check Graph Readiness
 
-Call `toolbelt_context` with `{ "namespace_id": "<namespace_id>" }`.
+Call `toolbelt_jobs` with `{ "namespace_id": "<namespace_id>" }` and inspect the
+job list for a `kg-rebuild` (or `graph_build` / `graph`) job entry.
 
-Inspect the returned context for knowledge graph indicators:
-- A `graph` or `knowledge_graph` section is present
-- Entity or node counts are greater than zero
+**If a `kg-rebuild` job is found and `completed`:** set `graph_ready = true`.
 
-Record the graph summary for inclusion in the RESULT. If no graph section appears,
-continue to Phase 5 — `toolbelt_graph describe` will confirm the actual state.
+**If a `kg-rebuild` job is found and `running`:** poll every 10 seconds, up to
+2 minutes. If it completes in that window, set `graph_ready = true`. If it
+times out, set `graph_ready = false` and emit the warning below.
+
+**If no `kg-rebuild` job is found, or it is in `failed` / `pending` state:**
+set `graph_ready = false` and emit this non-fatal warning — do NOT halt:
+
+```
+WARNING: kg-rebuild job has not run or did not complete for this namespace.
+The Kinetica knowledge graph is unavailable.
+Entity and relationship data will be surfaced from the vector/embedding store instead.
+```
+
+Proceed to Phase 5 regardless of `graph_ready`.
 
 ---
 
-## Phase 5: Describe Extracted Entities
+## Phase 5: Surface Entities
+
+### Path A — Graph describe (when `graph_ready = true`)
 
 Call `toolbelt_graph` with `operation: "describe"`:
 
@@ -206,7 +219,7 @@ Call `toolbelt_graph` with `operation: "describe"`:
 ```
 
 Parse the response to extract:
-- `graph_name`: the name of the knowledge graph (required for Phase 6 queries)
+- `graph_name`: the name of the knowledge graph (required for Phase 6 Cypher)
 - `entity_count`: total number of entity nodes extracted
 - `relationship_count`: total number of relationship edges extracted
 - `entity_types`: list of distinct entity type labels (e.g. PERSON, ORG, LOCATION, PRODUCT)
@@ -214,26 +227,41 @@ Parse the response to extract:
 
 Store `graph_name` — it is required as a parameter and as the prefix in every Cypher query.
 
-If the call fails or returns no graphs, emit structured failure and halt:
+If `toolbelt_graph describe` fails or returns no graphs despite `graph_ready = true`,
+reset `graph_ready = false` and continue with Path B.
+
+### Path B — Vector store entity search (when `graph_ready = false`)
+
+Run the following four `toolbelt_search` calls against the namespace to surface
+entity mentions extracted during the `semantic` job:
+
+```json
+{ "namespace_id": "<namespace_id>", "query": "people and persons mentioned" }
+{ "namespace_id": "<namespace_id>", "query": "organizations and companies" }
+{ "namespace_id": "<namespace_id>", "query": "locations cities and places" }
+{ "namespace_id": "<namespace_id>", "query": "products technologies and systems" }
 ```
-FAILURE: toolbelt_graph describe failed or returned no graphs.
-Error: <error message>
-```
+
+From the combined results, collect:
+- `entity_types`: the categories queried that returned results (`PERSON`, `ORG`, `LOCATION`, `PRODUCT`)
+- `sample_entities`: up to 5 representative names surfaced across the results
+- `entity_count`: approximate — set to the total number of distinct names found
+- `relationship_count`: set to `null` (not available via this path)
+- `graph_name`: set to `null`
+
+Note in the RESULT that counts are approximate and sourced from vector search.
 
 ---
 
 ## Phase 6: Explore Connections
 
-Surface the relationship data from the knowledge graph using two approaches in
-order. Use whichever succeeds.
-
-### Approach A — Cypher query (attempt first)
+### Path A — Cypher query (when `graph_ready = true` and `graph_name` is set)
 
 **Important:** Kinetica Cypher requires the query to begin with
 `GRAPH <graph_name> MATCH ...`. The `graph_name` must come from the Phase 5
 `describe` response.
 
-If `graph_name` was returned in Phase 5, attempt:
+Attempt:
 
 ```json
 {
@@ -245,20 +273,31 @@ If `graph_name` was returned in Phase 5, attempt:
 ```
 
 If the Cypher query succeeds, record:
-- `cypher_results`: rows returned (first 10)
+- `relationship_rows`: rows returned (first 10)
 - `result_count`: total rows
 - `query_method`: `"cypher"`
 
-### Approach B — Relationships from describe (fallback)
-
-If Approach A fails (HTTP 5xx, no graph name available, or zero rows), extract
-relationship edges directly from the `describe` response returned in Phase 5.
-
-The `describe` response includes `relationships` or `edges` arrays with
-`(source, relationship_type, target)` tuples. Parse those and record:
-- `cypher_results`: relationship rows extracted from `describe` (first 10)
+If Approach A fails (HTTP 5xx or zero rows), extract relationship edges from the
+Phase 5 `describe` response (`relationships` or `edges` arrays) and record:
+- `relationship_rows`: tuples extracted from `describe` (first 10)
 - `result_count`: total relationships from Phase 5 `relationship_count`
 - `query_method`: `"describe_fallback"`
+
+### Path B — Vector relationship search (when `graph_ready = false`)
+
+Run the following `toolbelt_search` calls to surface relationship-rich passages:
+
+```json
+{ "namespace_id": "<namespace_id>", "query": "founded by acquired partnership agreement" }
+{ "namespace_id": "<namespace_id>", "query": "works for reports to leads manages" }
+{ "namespace_id": "<namespace_id>", "query": "located in based in headquartered" }
+```
+
+From the combined results, extract the most informative relationship snippets.
+Present them as plain-language connection summaries (not structured tuples) and record:
+- `relationship_rows`: up to 10 plain-language relationship summaries
+- `result_count`: number of summaries
+- `query_method`: `"vector_search"`
 
 ---
 
@@ -271,21 +310,27 @@ RESULT:
   namespace_id: <uuid>
   document_name: <document name uploaded>
   phases_run: [0, 1, 2, 3, 4, 5, 6]
+  graph_ready: <true | false>
 
   knowledge_graph:
-    entity_count: <integer from Phase 5>
-    relationship_count: <integer from Phase 5>
+    entity_count: <integer, or "~N (approximate)" if vector path>
+    relationship_count: <integer, or null if vector path>
     entity_types: [<list of type labels>]
     sample_entities: [<up to 5 entity names>]
 
-  cypher_results:
-    query_method: "<'cypher' or 'describe_fallback'>"
-    query_used: "<cypher query executed, or 'toolbelt_graph describe' if fallback>"
+  connections:
+    query_method: "<cypher | describe_fallback | vector_search>"
+    query_used: "<query executed or 'toolbelt_search (relationship queries)' if vector path>"
     result_count: <integer>
     rows:
-      - source: "<name>" relationship: "<type>" target: "<name>"
-      - source: "<name>" relationship: "<type>" target: "<name>"
+      - source: "<name>" relationship: "<type>" target: "<name>"   # graph paths
+      - "<plain-language relationship summary>"                     # vector path
       ... (up to 10 rows)
+```
+
+If `graph_ready` was `false`, include a note:
+```
+  note: "kg-rebuild job was not available; entity and relationship data sourced from vector/embedding store. Re-run after kg-rebuild completes for full graph traversal."
 ```
 
 If Phase 5 or 6 produced partial data (e.g., counts present but no rows), include
@@ -300,8 +345,10 @@ what is available and note the gap. Only halt on Phase 0–3 failures.
 | 0. Verify connection | `get_semantic_names` |
 | 1. Resolve namespace | (from Phase 0 result) |
 | 2. Upload document | `toolbelt_save` |
-| 3. Poll for extraction | `toolbelt_jobs` |
-| 4. Confirm KG exists | `toolbelt_context` |
-| 5. Describe entities | `toolbelt_graph` (operation: describe) |
-| 6. Explore with Cypher | `toolbelt_graph` (operation: query) |
+| 3. Poll for extraction | `toolbelt_jobs` (ingest + semantic) |
+| 4. Check graph readiness | `toolbelt_jobs` (kg-rebuild; sets `graph_ready` flag) |
+| 5A. Describe entities (graph path) | `toolbelt_graph` (operation: describe) |
+| 5B. Surface entities (vector path) | `toolbelt_search` (4 entity-type queries) |
+| 6A. Explore connections (graph path) | `toolbelt_graph` (operation: query), fallback to describe |
+| 6B. Explore connections (vector path) | `toolbelt_search` (3 relationship queries) |
 | 7. Emit result | (structured output) |

@@ -156,11 +156,11 @@ Store the resulting table name as `stream_table`. Record `source_mode: "kafka"`.
 
 **If `kafka_broker` is not provided (simulated stream):**
 
-Upload the default sample data above as a relational asset using `toolbelt_save`:
+Upload the default sample data above as a document using `toolbelt_save`:
 
 ```json
 {
-  "asset_type": "relational",
+  "asset_type": "document",
   "namespace_id": "<namespace_id>",
   "name": "stream-readings",
   "file_name": "stream-readings.csv",
