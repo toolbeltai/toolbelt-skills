@@ -1,56 +1,71 @@
 name: Publish to npm
 
-# Fires on annotated tag push (e.g. v0.1.0). Publishes @toolbeltai/skills
-# as a PUBLIC npm package from this (currently private) source repo.
+# Fires on push to main when package.json's version field has changed vs
+# the previous commit. Auto-publishes @toolbeltai/skills via OIDC
+# (Trusted Publishing — no stored NPM_TOKEN) and auto-tags the commit.
 #
-# This workflow is the ONLY thing that talks to public package registries
-# in dev stage. The sibling `publish.yml` (ClawHub + Smithery) fires on
-# release:published — tags alone do NOT trigger it. That keeps ClawHub
-# publishing dormant until leadership approves a formal release.
+# Author workflow:
+#   1. Bump version in package.json (in a PR or direct commit)
+#   2. Merge to main → workflow publishes + tags
+#   3. Done. No manual  npm publish  or  git tag  step.
+#
+# Matches the pattern used by @toolbeltai/cli in the toolbelt monorepo.
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches: [main]
+    paths:
+      - 'package.json'
+      - 'bin/**'
+      - '**/SKILL.md'
+      - '.github/workflows/publish-npm.yml'
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      id-token: write   # required for npm provenance
+      contents: write   # tag push requires write
+      id-token: write   # OIDC token for npm Trusted Publishing
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2   # need previous commit to diff versions
 
-      # Node 24 ships with npm >= 11, which is required for Trusted
-      # Publishing + provenance. Don't try to self-upgrade npm on older
-      # Node versions — the in-place upgrade breaks on GH runners.
+      # Node 24 ships with npm >= 11 natively (required for Trusted
+      # Publishing). Do NOT try to self-upgrade npm on older Node
+      # versions — the in-place upgrade breaks on GH runners.
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Show npm version (must be >= 11.5.1)
-        run: npm --version
-
-      - name: Verify package.json version matches tag
+      - name: Check if version bumped
+        id: version
         run: |
-          PKG=$(node -p "require('./package.json').version")
-          TAG="${GITHUB_REF_NAME#v}"
-          if [ "$PKG" != "$TAG" ]; then
-            echo "::error::package.json version ($PKG) does not match tag ($TAG)"
-            exit 1
+          CURRENT=$(node -p "require('./package.json').version")
+          PREVIOUS=$(git show HEAD~1:package.json 2>/dev/null | node -e "try { let d=''; process.stdin.on('data', c=>d+=c).on('end', ()=>console.log(JSON.parse(d).version)); } catch { console.log(''); }" || echo "")
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "previous=$PREVIOUS" >> $GITHUB_OUTPUT
+          if [ "$CURRENT" != "$PREVIOUS" ] && [ -n "$CURRENT" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "→ version changed: $PREVIOUS → $CURRENT"
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "→ version unchanged ($CURRENT). Skipping publish."
           fi
 
-      # Trusted Publishing — npm authenticates via GitHub Actions' OIDC token.
-      # The `id-token: write` permission above is what makes this work.
-      # No NPM_TOKEN secret required, no 2FA interaction in CI.
-      # Requires the org or package to have a Trusted Publisher configured
-      # on npmjs.com pointing at this repo + workflow.
-      #
       # NOTE: --provenance omitted while this repo is private. npm rejects
       # provenance attestations from private source repos. Re-enable when
       # the repo is made public.
       - name: Publish
+        if: steps.version.outputs.changed == 'true'
         run: npm publish --access public
+
+      - name: Tag commit
+        if: steps.version.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "v${{ steps.version.outputs.current }}" -m "Published @toolbeltai/skills v${{ steps.version.outputs.current }}"
+          git push origin "v${{ steps.version.outputs.current }}"
