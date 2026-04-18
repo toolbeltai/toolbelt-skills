@@ -2,6 +2,11 @@ name: Regenerate Demo GIFs
 
 on:
   push:
+    # Branch pushes only — tag pushes check out a detached HEAD which
+    # breaks the auto-commit step (git-auto-commit-action can't push
+    # to a nameless ref). Release tags (v*.*.*) are handled by
+    # publish-npm.yml; gif regen is a branch-time concern.
+    branches: [main]
     paths:
       - "assets/demos/*.sh"
       - "*.tape"
