@@ -1,0 +1,43 @@
+name: Publish to npm
+
+# Fires on annotated tag push (e.g. v0.1.0). Publishes @toolbeltai/skills
+# as a PUBLIC npm package from this (currently private) source repo.
+#
+# This workflow is the ONLY thing that talks to public package registries
+# in dev stage. The sibling `publish.yml` (ClawHub + Smithery) fires on
+# release:published — tags alone do NOT trigger it. That keeps ClawHub
+# publishing dormant until leadership approves a formal release.
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # required for npm provenance
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Verify package.json version matches tag
+        run: |
+          PKG=$(node -p "require('./package.json').version")
+          TAG="${GITHUB_REF_NAME#v}"
+          if [ "$PKG" != "$TAG" ]; then
+            echo "::error::package.json version ($PKG) does not match tag ($TAG)"
+            exit 1
+          fi
+
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --provenance

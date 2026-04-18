@@ -1,0 +1,51 @@
+{
+  "name": "@toolbeltai/skills",
+  "version": "0.1.0",
+  "description": "Official Toolbelt skills for Claude Code and MCP agents — run-toolbelt, geo-analyst, knowledge-graph, sql-analyst, vector-search, streaming-analyst, multi-agent-workspace, data-blend.",
+  "license": "MIT",
+  "homepage": "https://toolbelt.ai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toolbeltai/toolbelt-skills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/toolbeltai/toolbelt-skills/issues"
+  },
+  "author": "Toolbelt",
+  "keywords": [
+    "toolbelt",
+    "claude-code",
+    "mcp",
+    "skills",
+    "openclaw",
+    "sql",
+    "knowledge-graph",
+    "geospatial",
+    "vector-search"
+  ],
+  "bin": {
+    "toolbelt-skills": "./bin/install.js"
+  },
+  "files": [
+    "bin",
+    "assets",
+    "data-blend",
+    "geo-analyst",
+    "knowledge-graph",
+    "multi-agent-workspace",
+    "run-toolbelt",
+    "sql-analyst",
+    "streaming-analyst",
+    "vector-search",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}
