@@ -37,7 +37,10 @@ jobs:
             exit 1
           fi
 
+      # Trusted Publishing — npm authenticates via GitHub Actions' OIDC token.
+      # The `id-token: write` permission above is what makes this work.
+      # No NPM_TOKEN secret required, no 2FA interaction in CI.
+      # Requires the org or package to have a Trusted Publisher configured
+      # on npmjs.com pointing at this repo + workflow.
       - name: Publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --access public --provenance
