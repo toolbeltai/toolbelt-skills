@@ -23,15 +23,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Node 24 ships with npm >= 11, which is required for Trusted
+      # Publishing + provenance. Don't try to self-upgrade npm on older
+      # Node versions — the in-place upgrade breaks on GH runners.
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
-      # Trusted Publishing requires npm >= 11.5.1. Node 22 ships with 10.x,
-      # so force-upgrade explicitly — cheap and unambiguous.
-      - name: Ensure npm >= 11.5.1
-        run: npm install -g npm@latest
+      - name: Show npm version (must be >= 11.5.1)
+        run: npm --version
 
       - name: Verify package.json version matches tag
         run: |
