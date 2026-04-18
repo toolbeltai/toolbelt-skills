@@ -48,5 +48,9 @@ jobs:
       # No NPM_TOKEN secret required, no 2FA interaction in CI.
       # Requires the org or package to have a Trusted Publisher configured
       # on npmjs.com pointing at this repo + workflow.
+      #
+      # NOTE: --provenance omitted while this repo is private. npm rejects
+      # provenance attestations from private source repos. Re-enable when
+      # the repo is made public.
       - name: Publish
-        run: npm publish --access public --provenance
+        run: npm publish --access public
