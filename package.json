@@ -1,6 +1,6 @@
 {
   "name": "@toolbeltai/skills",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Official Toolbelt skills for Claude Code and MCP agents — run-toolbelt, geo-analyst, knowledge-graph, sql-analyst, vector-search, streaming-analyst, multi-agent-workspace, data-blend.",
   "license": "MIT",
   "homepage": "https://toolbelt.ai",
