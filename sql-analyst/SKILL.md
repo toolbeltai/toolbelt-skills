@@ -1,24 +1,23 @@
 ---
 name: sql-analyst
 description: >
-  Text-to-SQL analyst powered by Toolbelt MCP. Toolbelt is a multi-modal data
-  platform combining SQL analytics, vector search, and real-time streaming.
-  Uploads a CSV, auto-generates schema context, then answers natural language
-  questions by generating and executing SQL. Use when an AI agent needs to analyze
-  tabular data without writing queries manually — upload, ask, get answers.
+  Upload a CSV and answer natural-language questions by generating and executing
+  SQL. Covers totals, averages, group-by, filtering, and single-table joins on
+  tabular data. Use when an agent has structured rows/columns and needs analytical
+  answers — trends, breakdowns, comparisons, rankings. NOT for unstructured
+  documents (use knowledge-graph or vector-search), lat/lon or WKT data (use
+  geo-analyst), live streams (use streaming-analyst), or multi-table JOINs across
+  independent datasets (use data-blend).
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
-  MCP-compatible AI agent (Claude Code, Claude Desktop, or any client that
-  supports MCP server connections). MCP connection must be pre-established
+  MCP-compatible AI agent (Claude Code, Claude Desktop, OpenClaw, or any client
+  that supports MCP server connections). MCP connection must be pre-established
   before invocation.
 metadata:
   author: toolbeltai
   version: "1.0"
-  openclaw:
-    emoji: "📊"
-    homepage: "https://toolbelt.ai/docs/sql"
-    skillKey: "sql-analyst"
+  homepage: "https://toolbelt.ai/docs/sql"
 ---
 
 Upload tabular data and answer natural language questions about it using

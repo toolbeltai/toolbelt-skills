@@ -1,27 +1,23 @@
 ---
 name: streaming-analyst
 description: >
-  Real-time streaming analytics powered by Toolbelt MCP. Toolbelt is a
-  multi-modal data platform combining SQL analytics, vector search, and real-time
-  streaming. Connects a Kafka topic, runs windowed aggregation queries, and detects
-  anomalies using standard deviation. Falls back to simulated stream data when no
-  Kafka broker is provided. Use when an AI agent needs to analyze streaming data —
-  IoT sensors, event logs, security events, or fleet telemetry — without writing
-  infrastructure code.
+  Connect a live Kafka topic (or use built-in simulated data) and run windowed
+  aggregations plus standard-deviation anomaly detection on the stream. Use when
+  an agent needs to analyze real-time or time-series data — IoT sensor readings,
+  event logs, security events, fleet telemetry, transaction feeds — and answer
+  questions about rates, trends, and outliers over time windows. NOT for static
+  tabular files (use sql-analyst) or document content (use vector-search).
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
-  MCP-compatible AI agent (Claude Code, Claude Desktop, or any client that
-  supports MCP server connections). MCP connection must be pre-established
+  MCP-compatible AI agent (Claude Code, Claude Desktop, OpenClaw, or any client
+  that supports MCP server connections). MCP connection must be pre-established
   before invocation. Kafka parameters are optional — omit them to run with
   simulated stream data.
 metadata:
   author: toolbeltai
   version: "1.0"
-  openclaw:
-    emoji: "📡"
-    homepage: "https://toolbelt.ai/docs/streaming"
-    skillKey: "streaming-analyst"
+  homepage: "https://toolbelt.ai/docs/streaming"
 ---
 
 Connect a Kafka topic (or simulate one) and run real-time aggregation and

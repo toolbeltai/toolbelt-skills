@@ -1,12 +1,12 @@
 ---
 name: run-toolbelt
 description: >
-  Toolbelt is a multi-modal data platform combining SQL analytics, vector search,
-  and real-time streaming — all queryable through natural language via MCP. This
-  skill provisions a namespace, ingests documents, connects Kafka topics, and
-  answers questions over the ingested data, end-to-end and autonomously. Use when
-  an AI agent needs to onboard to Toolbelt, add assets, connect a streaming source,
-  or run queries without any human interaction.
+  Provision a Toolbelt namespace, ingest a document or Kafka stream, and answer
+  a question end-to-end — autonomously, without human steps. Use when an agent
+  needs to set up a fresh Toolbelt workspace, add assets from scratch, connect a
+  streaming source, or run a complete ingest→query pipeline. NOT for querying
+  data that is already ingested — use sql-analyst, vector-search, or
+  knowledge-graph for that.
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -16,10 +16,7 @@ compatibility: >
 metadata:
   author: toolbeltai
   version: "2.0"
-  openclaw:
-    emoji: "🧰"
-    homepage: "https://toolbelt.ai/docs/mcp"
-    skillKey: "run-toolbelt"
+  homepage: "https://toolbelt.ai/docs/mcp"
 ---
 
 Execute Toolbelt end-to-end autonomously using the Toolbelt MCP tools.

@@ -1,26 +1,23 @@
 ---
 name: data-blend
 description: >
-  Join and correlate multiple datasets in a single Toolbelt namespace without
-  writing infrastructure code. Toolbelt is a multi-modal data platform combining
-  SQL analytics, vector search, and real-time streaming. Uploads two or more CSV
-  tables, then runs cross-table JOIN queries to surface relationships between
-  datasets. Use when an AI agent needs to combine data from different sources —
-  orders with customers, sensors with metadata, events with dimensions — and
-  answer questions that span multiple tables.
+  Upload two or more CSV tables into one Toolbelt namespace and run cross-table
+  JOIN queries to correlate them. Use when an agent has related datasets that
+  need to be combined — orders + customers, sensors + metadata, events +
+  dimensions, transactions + accounts — and questions span multiple tables that
+  share a key. NOT for single-table analysis (use sql-analyst), unstructured
+  text (use knowledge-graph), or entity-level relationship mapping across free
+  text (use knowledge-graph).
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
-  MCP-compatible AI agent (Claude Code, Claude Desktop, or any client that
-  supports MCP server connections). MCP connection must be pre-established
+  MCP-compatible AI agent (Claude Code, Claude Desktop, OpenClaw, or any client
+  that supports MCP server connections). MCP connection must be pre-established
   before invocation.
 metadata:
   author: toolbeltai
   version: "1.0"
-  openclaw:
-    emoji: "🔀"
-    homepage: "https://toolbelt.ai/docs/sql"
-    skillKey: "data-blend"
+  homepage: "https://toolbelt.ai/docs/sql"
 ---
 
 Upload multiple tables and run cross-table JOIN queries using Toolbelt MCP tools.

@@ -1,25 +1,23 @@
 ---
 name: geo-analyst
 description: >
-  GPU-accelerated geospatial analytics powered by Toolbelt MCP. Toolbelt is a
-  multi-modal data platform combining SQL analytics, vector search, and real-time
-  streaming. Uploads lat/lon sensor data, runs geospatial SQL queries (distance,
-  point-in-polygon, track creation), and emits structured results. Use when an AI
-  agent needs to analyze spatial data, compute distances, test point containment,
-  or build movement tracks without writing infrastructure code.
+  GPU-accelerated geospatial analytics on Toolbelt — distance, point-in-polygon
+  containment, nearest-neighbor, track creation, spatial joins. Upload lat/lon
+  sensor readings or WKT geometries, then run spatial SQL queries. Use when an
+  agent needs to answer geographic questions — how close is X to Y, which points
+  fall inside a region, along which route, coverage overlap, or movement tracks
+  from raw GPS. NOT for non-spatial tabular analysis (use sql-analyst) or
+  document content (use vector-search).
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
-  MCP-compatible AI agent (Claude Code, Claude Desktop, or any client that
-  supports MCP server connections). MCP connection must be pre-established
+  MCP-compatible AI agent (Claude Code, Claude Desktop, OpenClaw, or any client
+  that supports MCP server connections). MCP connection must be pre-established
   before invocation.
 metadata:
   author: toolbeltai
   version: "1.0"
-  openclaw:
-    emoji: "🌍"
-    homepage: "https://toolbelt.ai/docs/geospatial"
-    skillKey: "geo-analyst"
+  homepage: "https://toolbelt.ai/docs/geospatial"
 ---
 
 Execute GPU-accelerated geospatial analytics end-to-end using Toolbelt MCP tools.

@@ -1,26 +1,23 @@
 ---
 name: knowledge-graph
 description: >
-  Automatically extract entities and relationships from any document and explore
-  the results as a knowledge graph — no schema or ontology required. Toolbelt is
-  a multi-modal data platform combining SQL analytics, vector search, and
-  real-time streaming. Upload a document, then surface entities, relationship
-  types, and hidden connections via graph queries. Use when an AI agent needs to
-  turn unstructured text into structured, navigable knowledge without writing any
-  extraction code.
+  Upload a document; Toolbelt automatically extracts entities (people, orgs,
+  places, concepts) and their relationships into a knowledge graph — no schema
+  or ontology required. Query the graph with Cypher or natural language to
+  trace connections. Use when an agent needs to map who-relates-to-whom, surface
+  hidden links across documents, answer multi-hop relationship questions, or
+  identify central entities in a corpus. NOT for flat semantic passage retrieval
+  (use vector-search) or tabular analytics (use sql-analyst).
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
-  MCP-compatible AI agent (Claude Code, Claude Desktop, or any client that
-  supports MCP server connections). MCP connection must be pre-established
+  MCP-compatible AI agent (Claude Code, Claude Desktop, OpenClaw, or any client
+  that supports MCP server connections). MCP connection must be pre-established
   before invocation.
 metadata:
   author: toolbeltai
   version: "1.0"
-  openclaw:
-    emoji: "🕸️"
-    homepage: "https://toolbelt.ai/docs/knowledge-graph"
-    skillKey: "knowledge-graph"
+  homepage: "https://toolbelt.ai/docs/knowledge-graph"
 ---
 
 Extract a knowledge graph from a document and explore it autonomously using

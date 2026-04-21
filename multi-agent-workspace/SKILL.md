@@ -1,25 +1,22 @@
 ---
 name: multi-agent-workspace
 description: >
-  Set up a shared Toolbelt workspace for multi-agent collaboration. Toolbelt is a
-  multi-modal data platform combining SQL analytics, vector search, and real-time
-  streaming. Uploads a document to a namespace, generates a shareable asset URL,
-  and emits connection instructions for a second agent to join the same workspace.
-  Use when two or more agents need to share data, or when handing off context
-  between sessions without duplicating ingestion work.
+  Set up a Toolbelt namespace that multiple agents can share. Uploads a document,
+  then emits a connection URL another agent can use to join the same workspace
+  without re-ingesting. Use when handing off context between agents or sessions,
+  when two agents need to collaborate on the same dataset, or when pre-staging
+  data for a downstream agent. NOT needed for single-agent workflows — use
+  run-toolbelt instead.
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
-  MCP-compatible AI agent (Claude Code, Claude Desktop, or any client that
-  supports MCP server connections). MCP connection must be pre-established
+  MCP-compatible AI agent (Claude Code, Claude Desktop, OpenClaw, or any client
+  that supports MCP server connections). MCP connection must be pre-established
   before invocation.
 metadata:
   author: toolbeltai
   version: "1.0"
-  openclaw:
-    emoji: "🤝"
-    homepage: "https://toolbelt.ai/docs/multi-agent"
-    skillKey: "multi-agent-workspace"
+  homepage: "https://toolbelt.ai/docs/multi-agent"
 ---
 
 Set up a shared Toolbelt workspace and generate collaboration artifacts for a

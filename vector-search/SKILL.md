@@ -1,25 +1,23 @@
 ---
 name: vector-search
 description: >
-  Find semantically relevant passages from documents without keyword matching.
-  Toolbelt is a multi-modal data platform combining SQL analytics, vector search,
-  and real-time streaming. Upload a document, then retrieve the passages most
-  semantically similar to a natural language query. Use when an AI agent needs to
-  ground answers in source documents (RAG), find related content without exact
-  keyword matches, or rank passages by meaning rather than text overlap.
+  Upload a document and retrieve passages by semantic similarity to a
+  natural-language query. Ranks content by meaning, not keyword overlap. Use
+  when an agent needs to ground answers in source documents (RAG), find related
+  content, retrieve passages by concept, or answer "what does this doc say
+  about X" where X isn't a verbatim phrase. NOT for exact keyword/regex search,
+  structured table queries (use sql-analyst), or entity-relationship extraction
+  (use knowledge-graph).
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
-  MCP-compatible AI agent (Claude Code, Claude Desktop, or any client that
-  supports MCP server connections). MCP connection must be pre-established
+  MCP-compatible AI agent (Claude Code, Claude Desktop, OpenClaw, or any client
+  that supports MCP server connections). MCP connection must be pre-established
   before invocation.
 metadata:
   author: toolbeltai
   version: "1.0"
-  openclaw:
-    emoji: "🔍"
-    homepage: "https://toolbelt.ai/docs/vectors"
-    skillKey: "vector-search"
+  homepage: "https://toolbelt.ai/docs/vectors"
 ---
 
 Upload a document and retrieve semantically similar passages using Toolbelt MCP
