@@ -26,6 +26,9 @@ jobs:
     permissions:
       contents: write   # tag push requires write
       id-token: write   # OIDC token for npm Trusted Publishing
+      actions: write    # dispatch publish.yml — release events from
+                        # GITHUB_TOKEN don't trigger downstream workflows,
+                        # so we explicitly dispatch via gh workflow run
 
     steps:
       - uses: actions/checkout@v4
@@ -69,3 +72,13 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag "v${{ steps.version.outputs.current }}" -m "Published @toolbeltai/skills v${{ steps.version.outputs.current }}"
           git push origin "v${{ steps.version.outputs.current }}"
+
+      # Dispatch publish.yml (ClawHub + Smithery). publish.yml gates each
+      # registry step on its token secret, so it runs green as a no-op
+      # until CLAWHUB_TOKEN / SMITHERY_TOKEN are added to repo secrets.
+      - name: Dispatch downstream publish (ClawHub + Smithery)
+        if: steps.version.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run publish.yml -f VERSION="v${{ steps.version.outputs.current }}"

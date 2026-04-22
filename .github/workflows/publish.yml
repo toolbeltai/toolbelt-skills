@@ -1,26 +1,66 @@
 name: Publish Skills
 
+# Publishes skills to ClawHub (OpenClaw's registry) and registers the
+# Toolbelt MCP server with Smithery (smithery.ai).
+#
+# Triggers:
+#   1. `release: published`  — human cuts a GitHub Release (manual or via gh release create with a PAT)
+#   2. `workflow_dispatch`   — called by publish-npm.yml after a successful npm publish,
+#                              since GITHUB_TOKEN-created releases don't fire downstream workflows
+#
+# Safety:
+#   - Each publish step is gated on the presence of its required secret.
+#     If CLAWHUB_TOKEN isn't set, the ClawHub step is SKIPPED (not errored).
+#     Same for SMITHERY_TOKEN. The workflow will run green on the first
+#     trigger with no tokens, and the summary will say "skipped (no token)".
+#   - Add the secrets in repo Settings → Secrets and variables → Actions
+#     when ready to go live on each registry.
+
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      VERSION:
+        description: 'Version tag to publish (e.g., v0.1.3)'
+        required: true
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-
     steps:
+      - name: Resolve version
+        id: v
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ inputs.VERSION }}" >> $GITHUB_OUTPUT
+          fi
+
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.v.outputs.tag }}
 
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Install CLI tools
+      - name: Check for registry tokens
+        id: gate
         run: |
-          npm install -g clawhub
-          npm install -g @smithery/cli
+          echo "has_clawhub=${{ secrets.CLAWHUB_TOKEN != '' }}" >> $GITHUB_OUTPUT
+          echo "has_smithery=${{ secrets.SMITHERY_TOKEN != '' }}" >> $GITHUB_OUTPUT
+
+      # ── ClawHub ──────────────────────────────────────────────────────
+      - name: Install clawhub CLI
+        if: steps.gate.outputs.has_clawhub == 'true'
+        run: npm install -g clawhub
 
       - name: Publish skills to ClawHub
+        if: steps.gate.outputs.has_clawhub == 'true'
+        env:
+          CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
         run: |
           # Skills in this list are internal dev tools and must not be published.
           SKIP_DIRS="eval-run-toolbelt"
@@ -43,5 +83,29 @@ jobs:
           done
           exit $failed
 
+      # ── Smithery (MCP server registry — indexes mcp.toolbelt.ai) ─────
+      - name: Install Smithery CLI
+        if: steps.gate.outputs.has_smithery == 'true'
+        run: npm install -g @smithery/cli
+
       - name: Publish MCP server to Smithery
+        if: steps.gate.outputs.has_smithery == 'true'
+        env:
+          SMITHERY_TOKEN: ${{ secrets.SMITHERY_TOKEN }}
         run: smithery mcp publish "https://mcp.toolbelt.ai/mcp" -n toolbeltai/toolbelt
+
+      # ── Summary ──────────────────────────────────────────────────────
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Publish results for ${{ steps.v.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.gate.outputs.has_clawhub }}" = "true" ]; then
+            echo "- **ClawHub**: published" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **ClawHub**: skipped (CLAWHUB_TOKEN not set)" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ steps.gate.outputs.has_smithery }}" = "true" ]; then
+            echo "- **Smithery**: published" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Smithery**: skipped (SMITHERY_TOKEN not set)" >> $GITHUB_STEP_SUMMARY
+          fi
