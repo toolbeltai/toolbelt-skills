@@ -18,7 +18,7 @@ compatibility: >
   before invocation.
 metadata:
   author: toolbeltai
-  version: "1.0"
+  version: "2.0"
   homepage: "https://toolbelt.ai/docs/sql"
 ---
 
@@ -42,15 +42,23 @@ Extract these from the args string or conversation context before starting:
 | Parameter | Required | Description |
 |---|---|---|
 | `namespace_id` | No | UUID of target namespace. Auto-select if omitted and only one exists; fail if ambiguous. |
-| `csv_content` | No | Raw CSV text to upload. Uses the embedded sample dataset if omitted. |
-| `asset_name` | No | Name for the uploaded table asset. Defaults to `sales-data`. |
-| `question` | No | Natural language question to ask about the data. Defaults to `What is the total sales amount by region?` |
+| `csv_inputs` | No | Array of `{ name, content }` objects for multi-table analysis (e.g. orders + customers). Preferred when two or more related CSVs need JOINs. |
+| `csv_content` | No | Single CSV text (shorthand for `csv_inputs: [{ name: asset_name, content: ... }]`). |
+| `asset_name` | No | Name for the single uploaded table (when `csv_content` is used). Defaults to `sales-data`. |
+| `question` | No | Natural language question. Defaults vary by input shape (see below). |
+
+If neither `csv_inputs` nor `csv_content` is provided, use the single built-in
+sample dataset below with `asset_name = "sales-data"`.
+
+The resolved list of uploads is called **`uploads`** for the rest of this
+skill — each element has `{ name, content }`.
 
 ---
 
 ## Default Sample Data
 
-If no `csv_content` is provided, use this sales dataset verbatim:
+If no inputs are provided, use this single sales dataset verbatim as
+`uploads = [{ name: "sales-data", content: <csv below> }]`:
 
 ```
 order_id,date,region,product,category,quantity,unit_price,amount,rep
@@ -76,7 +84,11 @@ order_id,date,region,product,category,quantity,unit_price,amount,rep
 1020,2024-03-28,Midwest,Widget Pro,Hardware,14,49.99,699.86,Carol Singh
 ```
 
-Default `question`: `What is the total sales amount by region?`
+Default `question` for the single-table case:
+`What is the total sales amount by region?`
+
+For multi-table cases (`csv_inputs.length >= 2`) with no `question` provided,
+ask the user to clarify — don't guess a default cross-table question.
 
 ---
 
@@ -114,41 +126,45 @@ Store the resolved `namespace_id` — pass it to every subsequent tool call.
 
 ---
 
-## Phase 2: Upload CSV Data
+## Phase 2: Upload Each CSV
 
-Resolve `csv_content` (use parameter value or default sample above).
-Resolve `asset_name` (use parameter value or default `sales-data`).
+Resolve `uploads` per the Invocation Parameters section.
 
-Call `toolbelt_save`:
+**For each** `{ name, content }` in `uploads`, call `toolbelt_save`:
 
 ```json
 {
   "asset_type": "document",
   "namespace_id": "<namespace_id>",
-  "name": "<asset_name>",
-  "file_name": "<asset_name>.csv",
-  "content": "<csv_content>",
+  "name": "<name>",
+  "file_name": "<name>.csv",
+  "content": "<content>",
   "content_encoding": "text",
   "data_format": "csv"
 }
 ```
 
-Record the returned `asset_id`.
+Collect the returned `asset_id` for each upload into an array `asset_ids`.
+Track the upload count as `upload_count`.
+
+If any `toolbelt_save` fails, emit structured failure naming which upload
+failed and halt — partial multi-table ingests can't be joined.
 
 ---
 
-## Phase 3: Poll for Ingestion
+## Phase 3: Poll for All Ingestions
 
 Call `toolbelt_jobs` with `{ "namespace_id": "<namespace_id>" }` every 10 seconds.
 
-Wait for the `ingest` job for this asset to reach `completed`.
+Wait until **every** `ingest` job for the `asset_ids` from Phase 2 reaches `completed`.
 
-Typical duration: 15–60 seconds. Maximum wait: 3 minutes.
+Typical duration: 15–60 seconds per file. Maximum wait: 3 minutes total.
 
-If the job reaches `failed` or the timeout elapses, emit structured failure and halt:
+If any job reaches `failed` or the timeout elapses, emit structured failure:
 ```
-FAILURE: CSV ingestion did not complete.
+FAILURE: Ingestion did not complete for <asset_name>.
 Job status: <last observed status>
+Completed so far: <N of M>
 ```
 
 ---
@@ -157,19 +173,25 @@ Job status: <last observed status>
 
 Call `toolbelt_context` with `{ "namespace_id": "<namespace_id>" }`.
 
-Locate the table corresponding to the uploaded asset (match by `asset_name` or
-the table name returned from the save call). Record:
-- `table_name`: the SQL table name for this asset
-- `column_names`: list of columns in the table
-- `row_count`: number of rows if provided in context
+For each uploaded `asset_name` (from Phase 2), locate the corresponding
+table in the returned context and record:
+- `table_name`: the SQL table name
+- `column_names`: columns in that table
+- `row_count`: row count if provided
+
+Store all of them in a `tables` array so Phase 5 can reason about JOINs.
 
 ---
 
-## Phase 5: Ask a Natural Language Question
+## Phase 5: Answer the Question
 
-Resolve `question` (use parameter value or default).
+Resolve `question` per the Invocation Parameters section.
 
-Call `toolbelt_search`:
+**Decide on approach using `upload_count`:**
+
+### If `upload_count == 1` (single-table analytics)
+
+Prefer `toolbelt_search` (it routes through our hybrid + NL→SQL layer):
 
 ```json
 {
@@ -179,23 +201,49 @@ Call `toolbelt_search`:
 }
 ```
 
-Parse the response to extract:
-- `answer`: the synthesized natural language answer
-- `sql_generated`: the SQL query that was generated and executed
-- `row_count`: number of rows returned by the SQL query
-- `sources`: any cited source tables or assets
-
-If `toolbelt_search` does not return SQL, try `toolbelt_sql` directly with a
-query you write from the schema context:
+If `toolbelt_search` does not return SQL, fall back to `toolbelt_sql`
+with a query you write from the single table's schema:
 
 ```json
 {
   "namespace_id": "<namespace_id>",
-  "query": "SELECT region, SUM(amount) AS total_amount FROM <table_name> GROUP BY region ORDER BY total_amount DESC"
+  "query": "SELECT <...> FROM <table_name> ..."
 }
 ```
 
-Record whichever path succeeded as `query_method` (`"search"` or `"direct_sql"`).
+### If `upload_count >= 2` (multi-table JOIN)
+
+1. From the `tables` array collected in Phase 4, **identify candidate join
+   keys** — columns that appear in two or more tables with compatible types
+   and matching name patterns (e.g. `customer_id` in `orders` + `customers`).
+2. Write a `SELECT` that JOINs on the identified key(s) and answers the
+   user's question. Prefer explicit `JOIN ... ON ...` (never implicit join).
+3. Call `toolbelt_sql` directly with the JOIN query:
+
+```json
+{
+  "namespace_id": "<namespace_id>",
+  "query": "SELECT a.<col>, SUM(b.<col>) FROM <t1> a JOIN <t2> b ON a.<key> = b.<key> GROUP BY a.<col>"
+}
+```
+
+If no join key is identifiable, emit structured failure explaining which
+tables were uploaded and asking the caller to supply a join key:
+```
+FAILURE: Uploaded tables have no obvious join key.
+Tables and columns: [<summary>]
+Re-invoke with a question that specifies which column(s) relate the tables.
+```
+
+### For either case, parse the result:
+
+- `answer`: synthesized natural-language answer (if using `toolbelt_search`) or a one-sentence summary you compose from the rows (if using `toolbelt_sql` directly)
+- `sql_generated`: the SQL that ran
+- `row_count`: rows returned
+- `sources`: cited tables/assets
+
+Record the path used as `query_method` — `"search"` (NL→SQL via hybrid),
+`"direct_sql_single"` (one-table direct), or `"direct_sql_join"` (multi-table JOIN).
 
 ---
 
@@ -206,19 +254,22 @@ After all phases complete, emit a single structured result:
 ```
 RESULT:
   namespace_id: <uuid>
-  asset_name: <name of uploaded table>
-  table_name: <SQL table name>
-  row_count_ingested: <rows in the table>
+  uploaded_tables:
+    - asset_name: <name>
+      table_name: <sql table name>
+      column_names: [<list>]
+      row_count_ingested: <rows>
+  upload_count: <N>
   phases_run: [0, 1, 2, 3, 4, 5]
 
   question: "<question asked>"
-  query_method: "<'search' or 'direct_sql'>"
+  query_method: "<search | direct_sql_single | direct_sql_join>"
   sql_generated: |
-    <SQL query that was generated or executed>
-  row_count: <number of rows returned by the query>
+    <SQL query executed>
+  row_count: <rows returned>
   answer: |
-    <synthesized answer>
-  sources: [<cited tables or assets>]
+    <natural-language answer>
+  sources: [<tables cited>]
 ```
 
 ---
@@ -229,8 +280,28 @@ RESULT:
 |---|---|
 | 0. Verify connection | `toolbelt_list_namespaces` |
 | 1. Resolve namespace | (from Phase 0 result) |
-| 2. Upload CSV document | `toolbelt_save` |
+| 2. Upload each CSV | `toolbelt_save` (once per input) |
 | 3. Poll for ingestion | `toolbelt_jobs` |
 | 4. Get schema context | `toolbelt_context` |
-| 5. Ask question | `toolbelt_search`, `toolbelt_sql` (fallback) |
+| 5. Answer | `toolbelt_search` (single-table NL path), `toolbelt_sql` (direct; required for JOINs) |
 | 6. Emit result | (structured output) |
+
+---
+
+## Multi-Table Example
+
+Invocation:
+```
+/toolbelt-analyze csv_inputs=[
+  { name: "orders",    content: "order_id,customer_id,amount,..." },
+  { name: "customers", content: "customer_id,region,tier,..." }
+] question="Total amount by customer region"
+```
+
+Expected phases:
+- Phase 2: `toolbelt_save` for `orders`, then `toolbelt_save` for `customers`
+- Phase 3: poll both `ingest` jobs to completion
+- Phase 4: context returns two tables; record both schemas
+- Phase 5: identify `customer_id` as the join key, run
+  `SELECT c.region, SUM(o.amount) FROM orders o JOIN customers c ON o.customer_id = c.customer_id GROUP BY c.region`
+- Phase 6: structured result with `query_method = "direct_sql_join"` and both tables in `uploaded_tables`
