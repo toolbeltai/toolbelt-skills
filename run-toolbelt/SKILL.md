@@ -54,7 +54,7 @@ Skip Phase 5 if `question` is absent.
 
 ## Phase 0: Verify Connection
 
-Call `get_semantic_names` (no arguments) immediately.
+Call `toolbelt_list_namespaces` (no arguments) immediately.
 
 - **If it succeeds:** proceed to Phase 1 using the returned namespaces.
 - **If it fails:** emit structured failure and halt.
@@ -227,7 +227,7 @@ RESULT:
 
 | Phase | Tool(s) |
 |---|---|
-| 0. Verify connection | `get_semantic_names` |
+| 0. Verify connection | `toolbelt_list_namespaces` |
 | 1. Resolve namespace | (from Phase 0 result) |
 | 2. Inspect state | `toolbelt_context` |
 | 3. Add document | `toolbelt_save`, `toolbelt_jobs`, `toolbelt_context` |

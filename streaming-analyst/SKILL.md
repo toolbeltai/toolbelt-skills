@@ -96,7 +96,7 @@ sensor_id VARCHAR(64), ts TIMESTAMP, value DOUBLE, unit VARCHAR(32)
 
 ## Phase 0: Verify Connection
 
-Call `get_semantic_names` (no arguments) immediately.
+Call `toolbelt_list_namespaces` (no arguments) immediately.
 
 - **If it succeeds:** proceed to Phase 1 using the returned namespaces.
 - **If it fails:** emit structured failure and halt.
@@ -338,7 +338,7 @@ section and continue. Only halt on Phase 0–2 failures.
 
 | Phase | Tool(s) |
 |---|---|
-| 0. Verify connection | `get_semantic_names` |
+| 0. Verify connection | `toolbelt_list_namespaces` |
 | 1. Resolve namespace | (from Phase 0 result) |
 | 2. Connect stream | `toolbelt_connect` (Kafka) or `toolbelt_save` + `toolbelt_jobs` + `toolbelt_context` (simulated) |
 | 3. Confirm data arrival | `toolbelt_execute` × 1–2 |

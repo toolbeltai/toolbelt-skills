@@ -101,7 +101,7 @@ manufactured at a new facility in Round Rock, Texas.
 
 ## Phase 0: Verify Connection
 
-Call `get_semantic_names` (no arguments) immediately.
+Call `toolbelt_list_namespaces` (no arguments) immediately.
 
 - **If it succeeds:** proceed to Phase 1 using the returned namespaces.
 - **If it fails:** emit structured failure and halt.
@@ -339,7 +339,7 @@ what is available and note the gap. Only halt on Phase 0–3 failures.
 
 | Phase | Tool(s) |
 |---|---|
-| 0. Verify connection | `get_semantic_names` |
+| 0. Verify connection | `toolbelt_list_namespaces` |
 | 1. Resolve namespace | (from Phase 0 result) |
 | 2. Upload document | `toolbelt_save` |
 | 3. Poll for extraction | `toolbelt_jobs` (ingest + semantic) |

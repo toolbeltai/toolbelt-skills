@@ -70,7 +70,7 @@ POLYGON((-82.4650 27.9400, -82.4350 27.9400, -82.4350 27.9700, -82.4650 27.9700,
 
 ## Phase 0: Verify Connection
 
-Call `get_semantic_names` (no arguments) immediately.
+Call `toolbelt_list_namespaces` (no arguments) immediately.
 
 - **If it succeeds:** proceed to Phase 1 using the returned namespaces.
 - **If it fails:** emit structured failure and halt.
@@ -232,7 +232,7 @@ and continue with remaining queries. Only halt on Phase 0–2 failures.
 
 | Phase | Tool(s) |
 |---|---|
-| 0. Verify connection | `get_semantic_names` |
+| 0. Verify connection | `toolbelt_list_namespaces` |
 | 1. Resolve namespace | (from Phase 0 result) |
 | 2. Upload sensor data | `toolbelt_save`, `toolbelt_jobs`, `toolbelt_context` |
 | 3. Run geospatial queries | `toolbelt_execute` × 3 |
