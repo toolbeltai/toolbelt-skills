@@ -1,10 +1,10 @@
-# run-toolbelt
+# toolbelt-start
 
-![run-toolbelt demo](../assets/run-toolbelt-demo.gif)
+![toolbelt-start demo](../assets/toolbelt-start-demo.gif)
 
 Autonomous end-to-end Toolbelt agent. Provisions a namespace, ingests documents, connects streaming data sources, and answers questions — all without human interaction.
 
-Invoke via `/run-toolbelt` in Claude Code, or via the `Skill` tool in any MCP-capable agent.
+Invoke via `/toolbelt-start` in Claude Code, or via the `Skill` tool in any MCP-capable agent.
 
 ---
 
@@ -31,7 +31,7 @@ Invoke via `/run-toolbelt` in Claude Code, or via the `Skill` tool in any MCP-ca
 ### Smoke test — connection and namespace only
 
 ```
-/run-toolbelt
+/toolbelt-start
 ```
 
 Runs phases 0–2. Verifies the MCP connection is live and resolves your namespace. No data is written.
@@ -41,11 +41,11 @@ Runs phases 0–2. Verifies the MCP connection is live and resolves your namespa
 ### Ingest a document and ask a question
 
 ```
-/run-toolbelt document_url=https://example.com/report.pdf question="What are the key findings?"
+/toolbelt-start document_url=https://example.com/report.pdf question="What are the key findings?"
 ```
 
 ```
-/run-toolbelt document_content="Q1 revenue was $4.2M across three product lines." document_name="q1-summary" question="What was Q1 revenue?"
+/toolbelt-start document_content="Q1 revenue was $4.2M across three product lines." document_name="q1-summary" question="What was Q1 revenue?"
 ```
 
 ---
@@ -53,7 +53,7 @@ Runs phases 0–2. Verifies the MCP connection is live and resolves your namespa
 ### Target a specific namespace
 
 ```
-/run-toolbelt namespace_id=<uuid> document_url=https://example.com/report.pdf question="Summarize this."
+/toolbelt-start namespace_id=<uuid> document_url=https://example.com/report.pdf question="Summarize this."
 ```
 
 Required when your account has multiple namespaces. Omit to auto-select when only one exists.
@@ -63,7 +63,7 @@ Required when your account has multiple namespaces. Omit to auto-select when onl
 ### Connect a Kafka source
 
 ```
-/run-toolbelt kafka_broker=kafka-broker:9092 kafka_topic=events kafka_schema="id INTEGER, event VARCHAR(256), ts TIMESTAMP"
+/toolbelt-start kafka_broker=kafka-broker:9092 kafka_topic=events kafka_schema="id INTEGER, event VARCHAR(256), ts TIMESTAMP"
 ```
 
 Connects the topic and verifies it is queryable. Combine with `question` to search over streaming data.
@@ -73,7 +73,7 @@ Connects the topic and verifies it is queryable. Combine with `question` to sear
 ### Full pipeline
 
 ```
-/run-toolbelt \
+/toolbelt-start \
   namespace_id=<uuid> \
   document_url=https://example.com/report.pdf \
   kafka_broker=kafka-broker:9092 \
@@ -89,7 +89,7 @@ Runs all phases: document ingestion, Kafka connection, and cross-source search.
 ### From another agent (Skill tool)
 
 ```javascript
-{ skill: "run-toolbelt", args: "namespace_id=<uuid> document_url=https://... question=..." }
+{ skill: "toolbelt-start", args: "namespace_id=<uuid> document_url=https://... question=..." }
 ```
 
 The skill emits a structured `RESULT:` block — parseable by the calling agent without human interpretation.

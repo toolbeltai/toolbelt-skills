@@ -1,12 +1,12 @@
 ---
-name: streaming-analyst
+name: toolbelt-stream
 description: >
   Connect a live Kafka topic (or use built-in simulated data) and run windowed
   aggregations plus standard-deviation anomaly detection on the stream. Use when
   an agent needs to analyze real-time or time-series data — IoT sensor readings,
   event logs, security events, fleet telemetry, transaction feeds — and answer
   questions about rates, trends, and outliers over time windows. NOT for static
-  tabular files (use sql-analyst) or document content (use vector-search).
+  tabular files (use toolbelt-analyze) or document content (use toolbelt-find).
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -27,7 +27,7 @@ failure and halt.
 
 ## When Not To Use
 
-- For static batch tabular data — use `sql-analyst` instead.
+- For static batch tabular data — use `toolbelt-analyze` instead.
 - When real-time monitoring, windowed aggregation, or anomaly detection is not the goal.
 
 ## Invocation Parameters

@@ -1,13 +1,15 @@
 ---
-name: sql-analyst
+name: toolbelt-analyze
 description: >
-  Upload a CSV and answer natural-language questions by generating and executing
-  SQL. Covers totals, averages, group-by, filtering, and single-table joins on
-  tabular data. Use when an agent has structured rows/columns and needs analytical
-  answers — trends, breakdowns, comparisons, rankings. NOT for unstructured
-  documents (use knowledge-graph or vector-search), lat/lon or WKT data (use
-  geo-analyst), live streams (use streaming-analyst), or multi-table JOINs across
-  independent datasets (use data-blend).
+  Upload one or more CSV tables and answer natural-language questions by
+  generating and executing SQL. Handles single-table analytics (totals,
+  averages, group-by, filtering) AND multi-table JOINs across related
+  datasets (orders + customers, sensors + metadata, events + dimensions).
+  Use when an agent has structured rows/columns — one table or several
+  that share a key — and needs analytical answers: trends, breakdowns,
+  comparisons, rankings, correlations. NOT for unstructured documents
+  (use toolbelt-find or toolbelt-entities), lat/lon or WKT data (use
+  toolbelt-geo), or live streams (use toolbelt-stream).
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -20,15 +22,18 @@ metadata:
   homepage: "https://toolbelt.ai/docs/sql"
 ---
 
-Upload tabular data and answer natural language questions about it using
-Toolbelt MCP tools. Work through each phase in order without prompting for
-user input. On unrecoverable error, emit a structured failure and halt.
+Upload one or more CSV tables and answer natural-language questions about
+them using Toolbelt MCP tools. Handles both single-table queries and
+multi-table JOINs on related datasets — pick the right approach based on
+the uploaded data and the question. Work through each phase in order
+without prompting for user input. On unrecoverable error, emit a
+structured failure and halt.
 
 ## When Not To Use
 
-- For unstructured text or documents — use `knowledge-graph` to extract entities and relationships.
-- For real-time or streaming data — use `streaming-analyst` instead.
-- For spatial data with lat/lon coordinates — use `geo-analyst` instead.
+- For unstructured text or documents — use `toolbelt-find` (retrieval) or `toolbelt-entities` (entity/relationship extraction).
+- For real-time or streaming data — use `toolbelt-stream`.
+- For spatial data with lat/lon coordinates — use `toolbelt-geo`.
 
 ## Invocation Parameters
 

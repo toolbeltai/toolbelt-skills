@@ -1,13 +1,13 @@
 ---
-name: vector-search
+name: toolbelt-find
 description: >
   Upload a document and retrieve passages by semantic similarity to a
   natural-language query. Ranks content by meaning, not keyword overlap. Use
   when an agent needs to ground answers in source documents (RAG), find related
   content, retrieve passages by concept, or answer "what does this doc say
   about X" where X isn't a verbatim phrase. NOT for exact keyword/regex search,
-  structured table queries (use sql-analyst), or entity-relationship extraction
-  (use knowledge-graph).
+  structured table queries (use toolbelt-analyze), or entity-relationship extraction
+  (use toolbelt-entities).
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -26,10 +26,10 @@ unrecoverable error, emit a structured failure and halt.
 
 ## When Not To Use
 
-- For structured tabular data (CSV, SQL tables) — use `sql-analyst` instead.
-- For aggregate queries, counts, or filtering by exact values — use `sql-analyst`; vector search ranks by meaning, not criteria.
-- For entity and relationship extraction — use `knowledge-graph` instead.
-- When you need a synthesized answer that may draw on SQL tables — use `sql-analyst` with `toolbelt_search` (hybrid routing) instead.
+- For structured tabular data (CSV, SQL tables) — use `toolbelt-analyze` instead.
+- For aggregate queries, counts, or filtering by exact values — use `toolbelt-analyze`; vector search ranks by meaning, not criteria.
+- For entity and relationship extraction — use `toolbelt-entities` instead.
+- When you need a synthesized answer that may draw on SQL tables — use `toolbelt-analyze` with `toolbelt_search` (hybrid routing) instead.
 
 ## How This Differs From `toolbelt_search`
 
@@ -46,7 +46,7 @@ Extract these from the args string or conversation context before starting:
 |---|---|---|
 | `namespace_id` | No | UUID of target namespace. Auto-select if omitted and only one exists; fail if ambiguous. |
 | `document_content` | No | Raw text to upload. Uses the embedded sample document if omitted. |
-| `document_name` | No | Name for the document asset. Defaults to `vector-search-sample`. |
+| `document_name` | No | Name for the document asset. Defaults to `toolbelt-find-sample`. |
 | `question` | No | Natural language query to search for. Defaults to `What are the effects on coastal ecosystems?` |
 | `skip_upload` | No | Set to `true` to skip Phases 2–3 and search existing namespace content. |
 
@@ -142,7 +142,7 @@ Store the resolved `namespace_id` — pass it to every subsequent tool call.
 Skip this phase if `skip_upload` is `true`.
 
 Resolve `document_content` (use parameter value or default sample above).
-Resolve `document_name` (use parameter value or default `vector-search-sample`).
+Resolve `document_name` (use parameter value or default `toolbelt-find-sample`).
 
 Call `toolbelt_save`:
 

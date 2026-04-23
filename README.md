@@ -10,8 +10,8 @@ npx @toolbeltai/skills install
 ```
 
 Copies every skill to `~/.claude/skills/` (flat, per the AgentSkills spec).
-Restart Claude Code and you'll see them as slash commands: `/run-toolbelt`,
-`/geo-analyst`, …
+Restart Claude Code and you'll see them as slash commands: `/toolbelt-start`,
+`/toolbelt-geo`, …
 
 No account required; no network calls to Toolbelt. Skills work against any
 Toolbelt MCP server (cloud or self-hosted).
@@ -31,14 +31,13 @@ agent, and installs these skills — all at once.
 
 | Skill | Command | What it does |
 | --- | --- | --- |
-| [run-toolbelt](run-toolbelt/) | `/run-toolbelt` | Onboard, upload docs, connect data, ask questions |
-| [geo-analyst](geo-analyst/) | `/geo-analyst` | GPU-accelerated geospatial — queries and map rendering |
-| [knowledge-graph](knowledge-graph/) | `/knowledge-graph` | Auto-extract entities from docs, explore with Cypher |
-| [multi-agent-workspace](multi-agent-workspace/) | `/multi-agent-workspace` | Shareable MCP URL for multi-agent collaboration |
-| [sql-analyst](sql-analyst/) | `/sql-analyst` | Upload a CSV, ask plain English, get SQL + results |
-| [streaming-analyst](streaming-analyst/) | `/streaming-analyst` | Connect Kafka, aggregate, detect anomalies |
-| [vector-search](vector-search/) | `/vector-search` | Upload a document, retrieve semantically similar passages |
-| [data-blend](data-blend/) | `/data-blend` | Combine multiple tables with cross-table JOINs |
+| [toolbelt-start](toolbelt-start/) | `/toolbelt-start` | Onboard end-to-end — provision, ingest, first query |
+| [toolbelt-analyze](toolbelt-analyze/) | `/toolbelt-analyze` | Upload 1+ CSVs, ask in plain English, get SQL answers (single-table or multi-table JOIN) |
+| [toolbelt-find](toolbelt-find/) | `/toolbelt-find` | Upload a document, retrieve passages by semantic similarity |
+| [toolbelt-entities](toolbelt-entities/) | `/toolbelt-entities` | Auto-extract entities and relationships from docs, explore with Cypher |
+| [toolbelt-geo](toolbelt-geo/) | `/toolbelt-geo` | GPU-accelerated geospatial — distance, containment, routing, map rendering |
+| [toolbelt-stream](toolbelt-stream/) | `/toolbelt-stream` | Connect Kafka, aggregate over windows, detect anomalies |
+| [toolbelt-invite](toolbelt-invite/) | `/toolbelt-invite` | Emit a connection URL so another agent can join this workspace |
 
 ## Works with
 

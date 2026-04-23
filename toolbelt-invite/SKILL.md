@@ -1,12 +1,12 @@
 ---
-name: multi-agent-workspace
+name: toolbelt-invite
 description: >
   Set up a Toolbelt namespace that multiple agents can share. Uploads a document,
   then emits a connection URL another agent can use to join the same workspace
   without re-ingesting. Use when handing off context between agents or sessions,
   when two agents need to collaborate on the same dataset, or when pre-staging
   data for a downstream agent. NOT needed for single-agent workflows — use
-  run-toolbelt instead.
+  toolbelt-start instead.
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -26,7 +26,7 @@ prompting for user input. On unrecoverable error, emit a structured failure and 
 ## When Not To Use
 
 - For single-agent workflows where data sharing between agents is not needed.
-- When you only need to analyze data yourself — use `sql-analyst`, `streaming-analyst`, or `knowledge-graph` instead.
+- When you only need to analyze data yourself — use `toolbelt-analyze`, `toolbelt-stream`, or `toolbelt-entities` instead.
 
 ## Invocation Parameters
 

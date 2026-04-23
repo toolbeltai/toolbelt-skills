@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Simulates the geo-analyst skill running inside Claude Code
+# Simulates the toolbelt-geo skill running inside Claude Code
 
 G='\033[0;32m'   # green
 B='\033[0;34m'   # blue
@@ -10,7 +10,7 @@ W='\033[1;37m'   # bold white
 NC='\033[0m'
 
 printf "\n"
-printf "${D}> /geo-analyst${NC}\n"
+printf "${D}> /toolbelt-geo${NC}\n"
 sleep 0.8
 
 printf "\n"

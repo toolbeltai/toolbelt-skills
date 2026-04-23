@@ -1,5 +1,5 @@
 ---
-name: knowledge-graph
+name: toolbelt-entities
 description: >
   Upload a document; Toolbelt automatically extracts entities (people, orgs,
   places, concepts) and their relationships into a knowledge graph — no schema
@@ -7,7 +7,7 @@ description: >
   trace connections. Use when an agent needs to map who-relates-to-whom, surface
   hidden links across documents, answer multi-hop relationship questions, or
   identify central entities in a corpus. NOT for flat semantic passage retrieval
-  (use vector-search) or tabular analytics (use sql-analyst).
+  (use toolbelt-find) or tabular analytics (use toolbelt-analyze).
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -17,7 +17,7 @@ compatibility: >
 metadata:
   author: toolbeltai
   version: "1.0"
-  homepage: "https://toolbelt.ai/docs/knowledge-graph"
+  homepage: "https://toolbelt.ai/docs/toolbelt-entities"
 ---
 
 Extract a knowledge graph from a document and explore it autonomously using
@@ -26,8 +26,8 @@ user input. On unrecoverable error, emit a structured failure and halt.
 
 ## When Not To Use
 
-- For structured tabular data (CSV, SQL tables) — use `sql-analyst` instead.
-- When entity and relationship extraction is not needed — use `sql-analyst` or `streaming-analyst` for the appropriate data type.
+- For structured tabular data (CSV, SQL tables) — use `toolbelt-analyze` instead.
+- When entity and relationship extraction is not needed — use `toolbelt-analyze` or `toolbelt-stream` for the appropriate data type.
 
 ## Invocation Parameters
 

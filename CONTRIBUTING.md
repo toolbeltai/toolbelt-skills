@@ -12,9 +12,9 @@ the agent should run the workflow.
 
 ```
 toolbelt-skills/
-├── run-toolbelt/          # /run-toolbelt — onboarding walkthrough
-├── geo-analyst/           # /geo-analyst — GPU geospatial analytics
-├── knowledge-graph/       # ...
+├── toolbelt-start/          # /toolbelt-start — onboarding walkthrough
+├── toolbelt-geo/           # /toolbelt-geo — GPU geospatial analytics
+├── toolbelt-entities/       # ...
 ├── ...
 ├── bin/install.js         # standalone installer
 ├── package.json           # npm manifest (@toolbeltai/skills)

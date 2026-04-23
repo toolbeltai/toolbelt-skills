@@ -1,4 +1,4 @@
-Output assets/geo-analyst-demo.gif
+Output assets/toolbelt-start-demo.gif
 
 Set Width 1440
 Set Height 912
@@ -6,6 +6,6 @@ Set FontSize 16
 Set Theme "Dracula"
 
 Sleep 500ms
-Type "/geo-analyst"
+Type "/toolbelt-start"
 Enter
 Sleep 20s

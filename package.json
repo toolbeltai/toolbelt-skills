@@ -1,7 +1,7 @@
 {
   "name": "@toolbeltai/skills",
-  "version": "0.1.4",
-  "description": "Official Toolbelt skills for Claude Code and MCP agents — run-toolbelt, geo-analyst, knowledge-graph, sql-analyst, vector-search, streaming-analyst, multi-agent-workspace, data-blend.",
+  "version": "0.2.0",
+  "description": "Official Toolbelt skills — named /toolbelt-* flows (start, analyze, find, entities, geo, stream, invite) that teach any MCP-capable agent to orchestrate Toolbelt's MCP tools end-to-end.",
   "license": "MIT",
   "homepage": "https://toolbelt.ai",
   "repository": {
@@ -14,14 +14,17 @@
   "author": "Toolbelt",
   "keywords": [
     "toolbelt",
-    "claude-code",
     "mcp",
-    "skills",
+    "agent-skills",
+    "claude-code",
     "openclaw",
+    "cursor",
+    "windsurf",
     "sql",
+    "rag",
     "knowledge-graph",
     "geospatial",
-    "vector-search"
+    "streaming"
   ],
   "bin": {
     "toolbelt-skills": "./bin/install.js"
@@ -29,14 +32,13 @@
   "files": [
     "bin",
     "assets",
-    "data-blend",
-    "geo-analyst",
-    "knowledge-graph",
-    "multi-agent-workspace",
-    "run-toolbelt",
-    "sql-analyst",
-    "streaming-analyst",
-    "vector-search",
+    "toolbelt-start",
+    "toolbelt-analyze",
+    "toolbelt-find",
+    "toolbelt-entities",
+    "toolbelt-geo",
+    "toolbelt-stream",
+    "toolbelt-invite",
     "LICENSE",
     "README.md"
   ],

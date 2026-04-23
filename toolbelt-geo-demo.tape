@@ -1,4 +1,4 @@
-Output assets/run-toolbelt-demo.gif
+Output assets/toolbelt-geo-demo.gif
 
 Set Width 1440
 Set Height 912
@@ -6,6 +6,6 @@ Set FontSize 16
 Set Theme "Dracula"
 
 Sleep 500ms
-Type "/run-toolbelt"
+Type "/toolbelt-geo"
 Enter
 Sleep 20s

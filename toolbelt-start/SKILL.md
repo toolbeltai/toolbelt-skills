@@ -1,12 +1,12 @@
 ---
-name: run-toolbelt
+name: toolbelt-start
 description: >
   Provision a Toolbelt namespace, ingest a document or Kafka stream, and answer
   a question end-to-end — autonomously, without human steps. Use when an agent
   needs to set up a fresh Toolbelt workspace, add assets from scratch, connect a
   streaming source, or run a complete ingest→query pipeline. NOT for querying
-  data that is already ingested — use sql-analyst, vector-search, or
-  knowledge-graph for that.
+  data that is already ingested — use toolbelt-analyze, toolbelt-find, or
+  toolbelt-entities for that.
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -27,8 +27,8 @@ without confirmation. On unrecoverable error, emit a structured failure and halt
 ## When Not To Use
 
 - When the Toolbelt MCP connection is not yet established — the connection must exist before invocation.
-- When you only need to query data already in Toolbelt — use `sql-analyst` instead.
-- When you only need to upload and analyze a CSV — use `sql-analyst` instead.
+- When you only need to query data already in Toolbelt — use `toolbelt-analyze` instead.
+- When you only need to upload and analyze a CSV — use `toolbelt-analyze` instead.
 
 ## Invocation Parameters
 

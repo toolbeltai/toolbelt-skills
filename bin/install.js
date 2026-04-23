@@ -26,6 +26,21 @@ const PKG_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const TARGET = join(homedir(), '.claude', 'skills');
 const LEGACY_NESTED_DIR = join(TARGET, 'toolbelt');
 
+// Pre-0.2.0 skill folder names. Removed on install so upgraders don't
+// see ghost slash commands for skills that were renamed or merged.
+// Added 2026-04-23 with the toolbelt-* prefix rename; safe to drop this
+// list in a future major once the userbase has cycled.
+const LEGACY_SKILL_NAMES = [
+  'run-toolbelt',
+  'sql-analyst',
+  'data-blend',
+  'vector-search',
+  'knowledge-graph',
+  'geo-analyst',
+  'streaming-analyst',
+  'multi-agent-workspace',
+];
+
 /** Any top-level directory containing a SKILL.md is a skill. */
 function listSkills() {
   return readdirSync(PKG_ROOT, { withFileTypes: true })
@@ -38,6 +53,13 @@ function cleanupLegacy() {
   if (existsSync(LEGACY_NESTED_DIR)) {
     rmSync(LEGACY_NESTED_DIR, { recursive: true, force: true });
     console.log(`  migrated: removed legacy ~/.claude/skills/toolbelt/`);
+  }
+  for (const name of LEGACY_SKILL_NAMES) {
+    const p = join(TARGET, name);
+    if (existsSync(p)) {
+      rmSync(p, { recursive: true, force: true });
+      console.log(`  migrated: removed legacy skill ${name}/`);
+    }
   }
 }
 

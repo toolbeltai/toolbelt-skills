@@ -1,13 +1,13 @@
 ---
-name: geo-analyst
+name: toolbelt-geo
 description: >
   GPU-accelerated geospatial analytics on Toolbelt — distance, point-in-polygon
   containment, nearest-neighbor, track creation, spatial joins. Upload lat/lon
   sensor readings or WKT geometries, then run spatial SQL queries. Use when an
   agent needs to answer geographic questions — how close is X to Y, which points
   fall inside a region, along which route, coverage overlap, or movement tracks
-  from raw GPS. NOT for non-spatial tabular analysis (use sql-analyst) or
-  document content (use vector-search).
+  from raw GPS. NOT for non-spatial tabular analysis (use toolbelt-analyze) or
+  document content (use toolbelt-find).
 license: MIT
 compatibility: >
   Requires a Toolbelt account (provision free at https://toolbelt.ai) and an
@@ -27,8 +27,8 @@ without confirmation. On unrecoverable error, emit a structured failure and halt
 
 ## When Not To Use
 
-- For tabular data without lat/lon coordinates — use `sql-analyst` instead.
-- For unstructured text or documents — use `knowledge-graph` instead.
+- For tabular data without lat/lon coordinates — use `toolbelt-analyze` instead.
+- For unstructured text or documents — use `toolbelt-entities` instead.
 
 ## Invocation Parameters
 

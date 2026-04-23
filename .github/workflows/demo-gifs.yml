@@ -41,15 +41,15 @@ jobs:
 
       - name: Install skill scripts
         run: |
-          sudo cp assets/demos/run-toolbelt-demo.sh /run-toolbelt
-          sudo cp assets/demos/geo-analyst-demo.sh /geo-analyst
-          sudo chmod +x /run-toolbelt /geo-analyst
+          sudo cp assets/demos/toolbelt-start-demo.sh /toolbelt-start
+          sudo cp assets/demos/toolbelt-geo-demo.sh /toolbelt-geo
+          sudo chmod +x /toolbelt-start /toolbelt-geo
           sudo mkdir -p /usr/local/fake-bin
           sudo cp assets/demos/fake-curl.sh /usr/local/fake-bin/curl
           sudo chmod +x /usr/local/fake-bin/curl
 
       - name: Generate GIFs
-        run: ~/go/bin/vhs run-toolbelt-demo.tape && ~/go/bin/vhs geo-analyst-demo.tape && PATH=/usr/local/fake-bin:$PATH ~/go/bin/vhs signup.tape
+        run: ~/go/bin/vhs toolbelt-start-demo.tape && ~/go/bin/vhs toolbelt-geo-demo.tape && PATH=/usr/local/fake-bin:$PATH ~/go/bin/vhs signup.tape
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         env:
