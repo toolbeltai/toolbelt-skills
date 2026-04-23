@@ -35,7 +35,7 @@ toolbelt-skills/
 
 ```bash
 node bin/install.js list      # see skills that will install
-node bin/install.js install   # install into ~/.claude/skills/toolbelt/
+node bin/install.js install   # install into ~/.claude/skills/
 ```
 
 Then restart Claude Code — your new skill should appear as a slash command.

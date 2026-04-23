@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * toolbelt-skills — install Toolbelt's Claude Code skills into ~/.claude/skills/toolbelt/
+ * toolbelt-skills — install Toolbelt's skills into ~/.claude/skills/
  *
  * Usage:
  *   npx @toolbeltai/skills install       # copy skills (default)
@@ -11,6 +11,11 @@
  * The @toolbeltai/cli package wraps this for its own install flow; this
  * CLI exists so the skills package stands on its own — anyone can install
  * without needing the Toolbelt CLI or hitting any Toolbelt-hosted service.
+ *
+ * Layout: skills install FLAT under ~/.claude/skills/ per AgentSkills spec
+ * (agentskills.io) and Claude Code docs. An earlier version nested them
+ * under ~/.claude/skills/toolbelt/; that broke discovery in OpenClaw and
+ * was non-standard for Claude Code. We clean up the legacy dir on install.
  */
 import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
@@ -18,7 +23,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const PKG_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const TARGET = join(homedir(), '.claude', 'skills', 'toolbelt');
+const TARGET = join(homedir(), '.claude', 'skills');
+const LEGACY_NESTED_DIR = join(TARGET, 'toolbelt');
 
 /** Any top-level directory containing a SKILL.md is a skill. */
 function listSkills() {
@@ -26,6 +32,13 @@ function listSkills() {
     .filter((e) => e.isDirectory() && !e.name.startsWith('.') && e.name !== 'node_modules' && e.name !== 'bin' && e.name !== 'assets')
     .map((e) => e.name)
     .filter((name) => existsSync(join(PKG_ROOT, name, 'SKILL.md')));
+}
+
+function cleanupLegacy() {
+  if (existsSync(LEGACY_NESTED_DIR)) {
+    rmSync(LEGACY_NESTED_DIR, { recursive: true, force: true });
+    console.log(`  migrated: removed legacy ~/.claude/skills/toolbelt/`);
+  }
 }
 
 function cmdInstall() {
@@ -36,12 +49,14 @@ function cmdInstall() {
   }
 
   mkdirSync(TARGET, { recursive: true });
+  cleanupLegacy();
+
   for (const name of skills) {
     const src = join(PKG_ROOT, name);
     const dst = join(TARGET, name);
     rmSync(dst, { recursive: true, force: true });
     cpSync(src, dst, { recursive: true });
-    console.log(`  \u2713 ${name}`);
+    console.log(`  ✓ ${name}`);
   }
   // Optional assets (icons, tapes) — copy if present so popups render right.
   const assetsSrc = join(PKG_ROOT, 'assets');
@@ -57,12 +72,26 @@ function cmdInstall() {
 }
 
 function cmdUninstall() {
-  if (!existsSync(TARGET)) {
-    console.log('  (nothing to remove)');
-    return;
+  // Remove installed skills and legacy nested dir.
+  cleanupLegacy();
+  const skills = listSkills();
+  let removed = 0;
+  for (const name of skills) {
+    const dst = join(TARGET, name);
+    if (existsSync(dst)) {
+      rmSync(dst, { recursive: true, force: true });
+      removed++;
+    }
   }
-  rmSync(TARGET, { recursive: true, force: true });
-  console.log(`  Removed ${TARGET}`);
+  const assetsDst = join(TARGET, 'assets');
+  if (existsSync(assetsDst)) {
+    rmSync(assetsDst, { recursive: true, force: true });
+  }
+  if (removed === 0) {
+    console.log('  (nothing to remove)');
+  } else {
+    console.log(`  Removed ${removed} skills from ${TARGET}`);
+  }
 }
 
 function cmdList() {
@@ -74,7 +103,7 @@ function cmdPath() {
 }
 
 function usage() {
-  console.log(`toolbelt-skills — install Toolbelt skills into ~/.claude/skills/toolbelt/
+  console.log(`toolbelt-skills — install Toolbelt skills into ~/.claude/skills/
 
 Usage:
   npx @toolbeltai/skills install       Install skills (default)

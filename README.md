@@ -9,8 +9,9 @@
 npx @toolbeltai/skills install
 ```
 
-Copies every skill to `~/.claude/skills/toolbelt/`. Restart Claude Code and
-you'll see them as slash commands: `/run-toolbelt`, `/geo-analyst`, …
+Copies every skill to `~/.claude/skills/` (flat, per the AgentSkills spec).
+Restart Claude Code and you'll see them as slash commands: `/run-toolbelt`,
+`/geo-analyst`, …
 
 No account required; no network calls to Toolbelt. Skills work against any
 Toolbelt MCP server (cloud or self-hosted).
