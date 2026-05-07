@@ -181,7 +181,7 @@ Call `toolbelt_context` to get the table name. Store as `stream_table`.
 
 ## Phase 3: Confirm Data Arrival
 
-Call `toolbelt_execute` to verify the stream table is queryable and report
+Call `toolbelt_sql` to verify the stream table is queryable and report
 the initial row count:
 
 ```sql
@@ -209,7 +209,7 @@ Record `final_row_count`. If `final_row_count > initial_row_count`, set
 
 ## Phase 4: Aggregation Queries
 
-Run the following aggregation queries via `toolbelt_execute`. Substitute
+Run the following aggregation queries via `toolbelt_sql`. Substitute
 `<stream_table>` with the resolved table name throughout.
 
 ### Query 1 — Per-sensor stats
@@ -264,7 +264,7 @@ Record `window_rows` (number of rows returned).
 ## Phase 5: Anomaly Detection
 
 Detect readings that deviate more than `anomaly_threshold` standard deviations
-from the per-sensor mean. Run via `toolbelt_execute`:
+from the per-sensor mean. Run via `toolbelt_sql`:
 
 ```sql
 SELECT
@@ -341,7 +341,7 @@ section and continue. Only halt on Phase 0–2 failures.
 | 0. Verify connection | `toolbelt_list_namespaces` |
 | 1. Resolve namespace | (from Phase 0 result) |
 | 2. Connect stream | `toolbelt_connect` (Kafka) or `toolbelt_save` + `toolbelt_jobs` + `toolbelt_context` (simulated) |
-| 3. Confirm data arrival | `toolbelt_execute` × 1–2 |
-| 4. Aggregation queries | `toolbelt_execute` × 2 |
-| 5. Anomaly detection | `toolbelt_execute` × 1 |
+| 3. Confirm data arrival | `toolbelt_sql` × 1–2 |
+| 4. Aggregation queries | `toolbelt_sql` × 2 |
+| 5. Anomaly detection | `toolbelt_sql` × 1 |
 | 6. Emit result | (structured output) |

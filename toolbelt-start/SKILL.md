@@ -173,7 +173,7 @@ Call `toolbelt_connect`:
 
 Omit `extra_options` if `kafka_group_id` was not provided.
 
-Verify the table is queryable with `toolbelt_execute`:
+Verify the table is queryable with `toolbelt_sql`:
 ```json
 {
   "namespace_id": "<namespace_id>",
@@ -231,5 +231,5 @@ RESULT:
 | 1. Resolve namespace | (from Phase 0 result) |
 | 2. Inspect state | `toolbelt_context` |
 | 3. Add document | `toolbelt_save`, `toolbelt_jobs`, `toolbelt_context` |
-| 4. Connect Kafka | `toolbelt_connect`, `toolbelt_execute` |
+| 4. Connect Kafka | `toolbelt_connect`, `toolbelt_sql` |
 | 5. Ask a question | `toolbelt_search` |

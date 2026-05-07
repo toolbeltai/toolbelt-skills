@@ -139,7 +139,7 @@ uploaded asset. Store it as `sensor_table` for use in Phase 3.
 
 ## Phase 3: Run Geospatial Queries
 
-Run all three queries using `toolbelt_execute`. Pass `namespace_id` and `query`
+Run all three queries using `toolbelt_sql`. Pass `namespace_id` and `query`
 for each call. Collect results.
 
 **Note:** `ST_DISTANCE`, `ST_CONTAINS`, and `ST_MAKELINE` are Kinetica-native geospatial
@@ -235,5 +235,5 @@ and continue with remaining queries. Only halt on Phase 0–2 failures.
 | 0. Verify connection | `toolbelt_list_namespaces` |
 | 1. Resolve namespace | (from Phase 0 result) |
 | 2. Upload sensor data | `toolbelt_save`, `toolbelt_jobs`, `toolbelt_context` |
-| 3. Run geospatial queries | `toolbelt_execute` × 3 |
+| 3. Run geospatial queries | `toolbelt_sql` × 3 |
 | 4. Emit result | (structured output) |
