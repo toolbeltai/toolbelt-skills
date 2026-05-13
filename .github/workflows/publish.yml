@@ -22,7 +22,7 @@ on:
   workflow_dispatch:
     inputs:
       VERSION:
-        description: 'Version tag to publish (e.g., v0.1.3)'
+        description: "Version tag to publish (e.g., v0.1.3)"
         required: true
 
 jobs:
@@ -73,7 +73,7 @@ jobs:
             fi
             if [ -f "$dir/SKILL.md" ]; then
               echo "Publishing $dir..."
-              if (cd "$dir" && clawhub publish); then
+              if (cd "$dir" && clawhub publish --owner toolbeltai .); then
                 echo "✓ $dir published to ClawHub"
               else
                 echo "✗ $dir failed on ClawHub"
