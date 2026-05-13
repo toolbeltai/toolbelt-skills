@@ -1,6 +1,6 @@
 {
   "name": "@toolbeltai/skills",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Official Toolbelt skills — named /toolbelt-* flows (start, analyze, find, entities, geo, stream, invite) that teach any MCP-capable agent to orchestrate Toolbelt's MCP tools end-to-end.",
   "license": "MIT",
   "homepage": "https://toolbelt.ai",
