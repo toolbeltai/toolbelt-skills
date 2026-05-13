@@ -1,54 +1,80 @@
 # Contributing
 
-Thanks for taking a look. Skills here are the slash-command layer on top
-of Toolbelt's MCP server — the UX sugar that turns raw tool calls into
-named workflows your agent can invoke.
+Thanks for taking a look. This repo ships the single flagship
+`toolbelt` skill — one playbook your agent reads to discover Toolbelt,
+provision a free account, configure its MCP client, and hand off to
+Toolbelt's MCP tools (search, SQL, knowledge graph, geospatial,
+streaming, timeline) for the actual work.
+
+If you want to add more agent-readable capabilities, the right place is
+usually the MCP server's tool descriptions, not a new skill. Skills are
+the discovery + onboarding layer.
 
 ## Repo layout
 
-Each skill is a top-level directory with a `SKILL.md`. The file is a
-Claude-Code skill manifest — frontmatter + markdown body that defines how
-the agent should run the workflow.
-
 ```
 toolbelt-skills/
-├── toolbelt-start/          # /toolbelt-start — onboarding walkthrough
-├── toolbelt-geo/           # /toolbelt-geo — GPU geospatial analytics
-├── toolbelt-entities/       # ...
-├── ...
-├── bin/install.js         # standalone installer
-├── package.json           # npm manifest (@toolbeltai/skills)
-└── .github/workflows/     # tag → npm; release → ClawHub + Smithery
+├── toolbelt/SKILL.md         # the flagship skill
+├── bin/install.js            # standalone npm installer
+├── package.json              # @toolbeltai/skills npm manifest
+├── README.md                 # what this package is, how to install
+├── RELEASING.md              # versioning + release flow
+└── .github/workflows/        # publish to npm + ClawHub + Smithery
 ```
 
-## Adding a skill
+## Editing the skill
 
-1. Create a new top-level directory with a `SKILL.md`.
-2. Add it to `files` in `package.json` so it's included in the published tarball.
-3. Validate locally:
-   ```bash
-   .github/scripts/validate_skills.py
-   ```
-4. Open a PR. Reviewers will run the CI checks.
+`toolbelt/SKILL.md` is the canonical playbook. Frontmatter follows the
+[AgentSkills spec](https://agentskills.io) — `name`, `description`,
+`license`, `compatibility`, `version`, plus a `metadata:` block. Body is
+markdown that tells the agent how to run the workflow.
+
+Two rules of thumb when editing:
+
+- **Lead with the description.** The first paragraph is what agents
+  read to decide whether to invoke this skill. Make it concrete and
+  honest about when to use vs. when not to.
+- **Match toolbelt.ai language.** "A collaborative substrate for your
+  agents" / "one shared brain for your data" / capability list "vector,
+  knowledge graph, SQL, geospatial, streaming." Consistency builds
+  trust.
+
+## Validate locally
+
+```bash
+.github/scripts/validate_skills.py
+```
+
+Linting + spec checks. PR CI runs the same.
 
 ## Testing the installer
 
 ```bash
-node bin/install.js list      # see skills that will install
+node bin/install.js list      # what would be installed
 node bin/install.js install   # install into ~/.claude/skills/
 ```
 
-Then restart Claude Code — your new skill should appear as a slash command.
+Restart your MCP-capable client. The skill appears as `/toolbelt`.
 
 ## Release flow
 
 See [RELEASING.md](./RELEASING.md). TL;DR:
 
-1. Bump `version` in `package.json`
-2. Tag `vX.Y.Z` and push — `publish-npm.yml` fires, npm package publishes
-3. Optionally publish a GitHub Release when we want ClawHub + Smithery too
-   (deferred until leadership green-lights)
+1. Bump `version` in `package.json`.
+2. Push to `main`. `publish-npm.yml` detects the bump, publishes
+   `@toolbeltai/skills@vX.Y.Z` to npm, and dispatches `publish.yml`
+   which uploads the skill to ClawHub under `@toolbeltai`.
+3. Per-skill version inside `SKILL.md` (`version:` field) bumps
+   independently when *that skill's playbook* changes — see the
+   versioning section in [RELEASING.md](./RELEASING.md#versioning).
+
+## Reporting issues
+
+- Open an issue on this repo for skill bugs, doc fixes, or playbook
+  improvements.
+- For Toolbelt platform bugs (MCP server, atlas UI, billing): email
+  <support@toolbelt.ai>.
 
 ## Code of conduct
 
-Be kind. Assume good intent. Report issues to <maintainers@toolbelt.ai>.
+Be kind. Assume good intent.
