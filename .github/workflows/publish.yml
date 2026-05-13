@@ -83,12 +83,21 @@ jobs:
               [ -z "$SKILL_VER" ] && SKILL_VER="1.0.0"
               echo "Publishing $dir (version $SKILL_VER)..."
               outfile=$(mktemp)
+              # Clawscan note gives the ClawHub security scanner context
+              # for behaviors it would otherwise flag as suspicious:
+              # - Calls one public unauthenticated HTTP endpoint to
+              #   provision a free Toolbelt account.
+              # - Writes the resulting MCP-server URL + bearer token to
+              #   the user's agent client config (Claude Desktop / Cursor
+              #   / etc. config JSON). Same thing the official
+              #   @toolbeltai/cli does. Token belongs to the just-created
+              #   anonymous account scoped to one namespace.
+              CLAWSCAN_NOTE='This skill is an onboarding playbook for Toolbelt (https://toolbelt.ai). It performs two privileged actions, both by user intent: (1) HTTPS POST to https://app.toolbelt.ai/api/onboard to provision a free anonymous Toolbelt account, no auth required; (2) writes the returned MCP server URL plus the new anonymous bearer token into the user agent client config (Claude Desktop, Cursor, Windsurf, OpenClaw, Gemini, Codex CLI). The token belongs to the just-created anon namespace and grants access only to that namespace. Same flow as the official @toolbeltai/cli npm package. Source: https://github.com/toolbeltai/toolbelt-skills.'
               # bash -eo pipefail is the default GH Actions shell; the
               # `if (subshell); then` form is the only pattern that
               # cleanly captures both the exit code AND the output of a
-              # failing command without tripping errexit. Both stdout
-              # and stderr go to outfile.
-              if (cd "$dir" && clawhub publish --owner toolbeltai --version "$SKILL_VER" . >"$outfile" 2>&1); then
+              # failing command without tripping errexit.
+              if (cd "$dir" && clawhub publish --owner toolbeltai --version "$SKILL_VER" --clawscan-note "$CLAWSCAN_NOTE" . >"$outfile" 2>&1); then
                 echo "✓ $dir published to ClawHub"
               elif grep -q "Version already exists" "$outfile"; then
                 echo "= $dir already at $SKILL_VER (no-op)"
