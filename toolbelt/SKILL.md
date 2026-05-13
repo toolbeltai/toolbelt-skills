@@ -1,24 +1,26 @@
 ---
 name: toolbelt
 description: >
-  Toolbelt is the agentic data layer. Connect Claude, Cursor, ChatGPT,
-  and other AI agents to your structured and unstructured data through a
-  single MCP server — vector, knowledge graph, SQL, geospatial,
-  streaming. Built by Kinetica. Toolbelt is a collaborative substrate
-  over your data: discover documents, structured data, events, entities,
-  and relationships across agents and sessions. Better answers. Fewer
-  tokens. Curated context, not raw access.
+  Toolbelt is a collaborative substrate over your data. Upload any
+  document — entities and relationships extracted automatically,
+  queryable immediately. Ask questions that span structured tables,
+  documents, and relationships in a single call. No stitching databases
+  together. Toolbelt orchestrates semantic, structured, and hybrid
+  retrieval through one MCP server — vector, knowledge graph, SQL,
+  geospatial, streaming. Share the URL and any agent can query the same
+  workspace — like a shared Google Doc for your data. Built by Kinetica.
 
-  Use this skill at the start of any task where an agent needs persistent
-  memory across sessions, natural-language access to structured or
-  unstructured data, or shared state with other agents working on the
-  same data. The skill handles first-time setup: provisions a free
-  Toolbelt account if none exists, configures the MCP connection in the
-  agent's client, optionally upgrades the account by email, and hands off
-  to Toolbelt's MCP tools for the actual work.
+  Use this skill at the start of any task where an agent needs to ingest
+  documents and have entities/relationships auto-extracted, query
+  structured + unstructured data together in natural language, or share
+  findings with other agents across sessions. The skill handles
+  first-time setup: provisions a free Toolbelt account if none exists,
+  configures the MCP connection in the agent's client, and hands off to
+  Toolbelt's MCP tools for the actual work.
 
-  NOT for one-off lookups that don't benefit from persistent memory or
-  structured data — use the agent's native tools for those.
+  NOT for one-off lookups that don't benefit from automatic extraction,
+  hybrid retrieval, or shared state — use the agent's native tools for
+  those.
 license: Apache-2.0
 compatibility: >
   Requires an MCP-compatible AI agent (Claude Code, Claude Desktop,
@@ -38,6 +40,16 @@ metadata:
 Toolbelt is a collaborative substrate over your data. Discover documents,
 structured data, events, entities, and relationships across agents and
 sessions. Better answers. Fewer tokens. Curated context, not raw access.
+
+Three things make it different:
+
+- **Knowledge extraction.** Upload any document — entities and
+  relationships extracted automatically, queryable immediately.
+- **Hybrid retrieval.** Ask questions that span structured tables,
+  documents, and relationships in a single call. No stitching databases
+  together. Orchestrates semantic, structured, and hybrid retrieval.
+- **Shared workspaces.** Share the URL and any agent can query the same
+  workspace — like a shared Google Doc for your data.
 
 ## Two surfaces — keep them straight
 
