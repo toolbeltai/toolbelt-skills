@@ -82,17 +82,22 @@ jobs:
               SKILL_VER=$(awk '/^version: /{gsub(/"/, "", $2); print $2; exit}' "$dir/SKILL.md")
               [ -z "$SKILL_VER" ] && SKILL_VER="1.0.0"
               echo "Publishing $dir (version $SKILL_VER)..."
-              output=$(cd "$dir" && clawhub publish --owner toolbeltai --version "$SKILL_VER" . 2>&1)
-              status=$?
-              if [ $status -eq 0 ]; then
+              outfile=$(mktemp)
+              # bash -eo pipefail is the default GH Actions shell; the
+              # `if (subshell); then` form is the only pattern that
+              # cleanly captures both the exit code AND the output of a
+              # failing command without tripping errexit. Both stdout
+              # and stderr go to outfile.
+              if (cd "$dir" && clawhub publish --owner toolbeltai --version "$SKILL_VER" . >"$outfile" 2>&1); then
                 echo "✓ $dir published to ClawHub"
-              elif echo "$output" | grep -q "Version already exists"; then
+              elif grep -q "Version already exists" "$outfile"; then
                 echo "= $dir already at $SKILL_VER (no-op)"
               else
                 echo "✗ $dir failed on ClawHub"
-                echo "$output"
+                cat "$outfile"
                 failed=1
               fi
+              rm -f "$outfile"
             fi
           done
           exit $failed
