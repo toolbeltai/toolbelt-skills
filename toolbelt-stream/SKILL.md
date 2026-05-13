@@ -16,7 +16,7 @@ compatibility: >
   simulated stream data.
 metadata:
   author: toolbeltai
-  version: "1.0"
+  version: "1.0.0"
   homepage: "https://toolbelt.ai/docs/streaming"
 ---
 

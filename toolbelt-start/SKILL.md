@@ -15,7 +15,7 @@ compatibility: >
   before invocation.
 metadata:
   author: toolbeltai
-  version: "2.0"
+  version: "2.0.0"
   homepage: "https://toolbelt.ai/docs/mcp"
 ---
 

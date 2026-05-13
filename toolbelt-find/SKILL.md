@@ -16,7 +16,7 @@ compatibility: >
   before invocation.
 metadata:
   author: toolbeltai
-  version: "1.0"
+  version: "1.0.0"
   homepage: "https://toolbelt.ai/docs/vectors"
 ---
 
