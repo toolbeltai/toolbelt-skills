@@ -70,15 +70,9 @@ jobs:
       - name: Publish skills to ClawHub
         if: steps.gate.outputs.has_clawhub == 'true'
         run: |
-          # Skills in this list are internal dev tools and must not be published.
-          SKIP_DIRS="eval-run-toolbelt"
           failed=0
           for dir in */; do
             dir="${dir%/}"
-            if echo "$SKIP_DIRS" | grep -qw "$dir"; then
-              echo "Skipping $dir (internal — not published to ClawHub)"
-              continue
-            fi
             if [ -f "$dir/SKILL.md" ]; then
               # Each skill's version is independent of the npm package
               # version — see RELEASING.md "Versioning". Read the top-level

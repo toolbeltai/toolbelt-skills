@@ -16,7 +16,7 @@ description: >
 
   NOT for one-off lookups that don't benefit from persistent memory or
   structured data — use the agent's native tools for those.
-license: MIT
+license: Apache-2.0
 compatibility: >
   Requires an MCP-compatible AI agent (Claude Code, Claude Desktop,
   OpenClaw, Cursor, Windsurf, Gemini CLI, Codex CLI, or any client that

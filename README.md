@@ -5,7 +5,7 @@ The official skill for [Toolbelt](https://toolbelt.ai). Installs one
 Toolbelt namespace and hand off to Toolbelt's MCP tools.
 
 [![npm version](https://img.shields.io/npm/v/@toolbeltai/skills.svg)](https://www.npmjs.com/package/@toolbeltai/skills)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 ## Install
 
@@ -56,4 +56,4 @@ npx @toolbeltai/skills path          # print install target
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+Apache 2.0 — see [LICENSE](./LICENSE).
