@@ -58,11 +58,18 @@ jobs:
             echo "→ version unchanged ($CURRENT). Skipping publish."
           fi
 
-      # NOTE: --provenance omitted while this repo is private. npm rejects
-      # provenance attestations from private source repos. Re-enable when
-      # the repo is made public.
+      # Auth notes (re-evaluate when the repo goes public):
+      #   - --provenance omitted because npm rejects provenance attestations
+      #     from private source repos.
+      #   - OIDC Trusted Publishing has inconsistent behavior with private
+      #     repos: the trust config saves cleanly on npmjs.com, but the
+      #     publish step gets "OIDC publish authorize: Invalid token" at
+      #     handshake time. Falling back to a classic NPM_TOKEN until the
+      #     repo is public and OIDC works reliably end-to-end.
       - name: Publish
         if: steps.version.outputs.changed == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --access public
 
       - name: Tag commit
