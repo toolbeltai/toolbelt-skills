@@ -100,7 +100,11 @@ jobs:
       - name: Publish MCP server to Smithery
         if: steps.gate.outputs.has_smithery == 'true'
         env:
-          SMITHERY_TOKEN: ${{ secrets.SMITHERY_TOKEN }}
+          # Smithery CLI reads SMITHERY_API_KEY, not SMITHERY_TOKEN
+          # (verified live: without this rename the CLI prompts
+          # interactively and the workflow hangs). The repo secret name
+          # stays SMITHERY_TOKEN so we don't have to rotate it.
+          SMITHERY_API_KEY: ${{ secrets.SMITHERY_TOKEN }}
         run: smithery mcp publish "https://mcp.toolbelt.ai/mcp" -n toolbeltai/toolbelt
 
       # ── Summary ──────────────────────────────────────────────────────
