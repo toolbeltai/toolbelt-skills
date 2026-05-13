@@ -1,7 +1,0 @@
-# toolbelt-geo
-
-![toolbelt-geo demo](../assets/toolbelt-geo-demo.gif)
-
-GPU-accelerated geospatial analytics agent powered by Toolbelt MCP. Uploads lat/lon sensor data, runs geospatial SQL queries (distance, point-in-polygon, track creation), and emits structured results.
-
-Invoke via `/toolbelt-geo` in Claude Code, or via the `Skill` tool in any MCP-capable agent.
