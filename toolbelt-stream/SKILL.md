@@ -14,9 +14,9 @@ compatibility: >
   that supports MCP server connections). MCP connection must be pre-established
   before invocation. Kafka parameters are optional — omit them to run with
   simulated stream data.
+version: "1.0.0"
 metadata:
   author: toolbeltai
-  version: "1.0.0"
   homepage: "https://toolbelt.ai/docs/streaming"
 ---
 

@@ -14,9 +14,9 @@ compatibility: >
   MCP-compatible AI agent (Claude Code, Claude Desktop, OpenClaw, or any client
   that supports MCP server connections). MCP connection must be pre-established
   before invocation.
+version: "1.0.0"
 metadata:
   author: toolbeltai
-  version: "1.0.0"
   homepage: "https://toolbelt.ai/docs/vectors"
 ---
 
