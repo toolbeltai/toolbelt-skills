@@ -80,8 +80,14 @@ jobs:
               continue
             fi
             if [ -f "$dir/SKILL.md" ]; then
-              echo "Publishing $dir..."
-              if (cd "$dir" && clawhub publish --owner toolbeltai .); then
+              # Extract version from SKILL.md frontmatter; fall back to a default if absent.
+              # clawhub publish auto-derives --version internally but our values
+              # (e.g. "2.0" with implicit ".0") don't pass its semver check, so
+              # we pass --version explicitly.
+              SKILL_VER=$(awk '/^version: /{gsub(/"/, "", $2); print $2; exit}' "$dir/SKILL.md")
+              [ -z "$SKILL_VER" ] && SKILL_VER="1.0.0"
+              echo "Publishing $dir (version $SKILL_VER)..."
+              if (cd "$dir" && clawhub publish --owner toolbeltai --version "$SKILL_VER" .); then
                 echo "✓ $dir published to ClawHub"
               else
                 echo "✗ $dir failed on ClawHub"
