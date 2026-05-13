@@ -25,7 +25,11 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write   # tag push requires write
-      id-token: write   # OIDC token for npm Trusted Publishing
+      # id-token: write deliberately omitted — its presence forces
+      # actions/setup-node to use OIDC publish auth, which fails on
+      # private repos. NPM_TOKEN env (set on the Publish step) is the
+      # auth path. Re-add id-token: write when the repo goes public
+      # and we want OIDC + provenance attestations back.
       actions: write    # dispatch publish.yml — release events from
                         # GITHUB_TOKEN don't trigger downstream workflows,
                         # so we explicitly dispatch via gh workflow run
