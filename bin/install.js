@@ -26,11 +26,16 @@ const PKG_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const TARGET = join(homedir(), '.claude', 'skills');
 const LEGACY_NESTED_DIR = join(TARGET, 'toolbelt');
 
-// Pre-0.2.0 skill folder names. Removed on install so upgraders don't
-// see ghost slash commands for skills that were renamed or merged.
-// Added 2026-04-23 with the toolbelt-* prefix rename; safe to drop this
-// list in a future major once the userbase has cycled.
+// Skill folder names that earlier versions of this package installed
+// but no longer ship. Removed on install so upgraders don't see ghost
+// slash commands for skills that were renamed, merged, or collapsed.
+//
+//   v0.1.x → v0.2.0   prefix rename + a couple of merges
+//   v0.2.x → v1.0.0   seven task skills collapsed into one `toolbelt`
+//
+// Safe to drop these in a future major once the userbase has cycled.
 const LEGACY_SKILL_NAMES = [
+  // pre-v0.2.0
   'run-toolbelt',
   'sql-analyst',
   'data-blend',
@@ -39,6 +44,14 @@ const LEGACY_SKILL_NAMES = [
   'geo-analyst',
   'streaming-analyst',
   'multi-agent-workspace',
+  // pre-v1.0.0 (the seven that collapsed into the flagship)
+  'toolbelt-start',
+  'toolbelt-analyze',
+  'toolbelt-find',
+  'toolbelt-entities',
+  'toolbelt-geo',
+  'toolbelt-stream',
+  'toolbelt-invite',
 ];
 
 /** Any top-level directory containing a SKILL.md is a skill. */

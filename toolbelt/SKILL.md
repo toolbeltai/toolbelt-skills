@@ -3,24 +3,25 @@ name: toolbelt
 description: >
   Toolbelt is a collaborative substrate for your agents — one shared brain
   for your data. Connect AI agents to vector search, knowledge graph, SQL,
-  geospatial, and streaming data through one MCP server.
+  geospatial, and streaming data through one MCP server. Findings,
+  decisions, and observations persist across sessions and across agents.
 
   Use this skill at the start of any task where an agent needs persistent
   memory across sessions, natural-language access to structured or
   unstructured data, or shared state with other agents working on the same
-  data. The skill handles the full first-time setup: provisions a free
-  Toolbelt namespace if none exists, configures the MCP connection in the
-  agent's client, and hands off to Toolbelt's MCP tools for the actual
-  work.
+  data. The skill handles first-time setup: provisions a free Toolbelt
+  account if none exists, configures the MCP connection in the agent's
+  client, optionally upgrades the account by email, and hands off to
+  Toolbelt's MCP tools for the actual work.
 
   NOT for one-off lookups that don't benefit from persistent memory or
   structured data — use the agent's native tools for those.
 license: MIT
 compatibility: >
   Requires an MCP-compatible AI agent (Claude Code, Claude Desktop,
-  OpenClaw, Cursor, Windsurf, or any client that supports MCP server
-  connections). No Toolbelt account required — this skill provisions one
-  on first use.
+  OpenClaw, Cursor, Windsurf, Gemini CLI, Codex CLI, or any client that
+  supports MCP server connections). No Toolbelt account required — this
+  skill provisions one on first use.
 version: "1.0.0"
 metadata:
   author: toolbeltai
@@ -29,16 +30,31 @@ metadata:
 
 # Toolbelt — A collaborative substrate for your agents
 
-Your data. Your agents. One shared brain.
+**Your data. Your agents. One shared brain.**
 
 Toolbelt connects AI agents to vector search, knowledge graph, SQL,
 geospatial, and streaming data through one MCP server. Findings,
-decisions, and observations persist across sessions and across agents —
-so each agent's work compounds instead of evaporating.
+decisions, and observations persist across sessions and across agents.
 
-## When to invoke
+## Two surfaces — keep them straight
 
-Run this skill at the start of any task that:
+Toolbelt has exactly two surfaces. Knowing which is which is the most
+important thing in this skill:
+
+| Surface | URL | Who uses it | When |
+|---|---|---|---|
+| **MCP server** (the agentic surface) | `https://mcp.toolbelt.ai/mcp` | **Agents** | Every data operation. This is where the agentic flow happens — search, SQL, knowledge graph, record findings, read timeline. |
+| **app.toolbelt.ai** (the human web UI) | `https://app.toolbelt.ai` | **Humans** (in a browser) | Sign in, view/manage namespaces, billing, Pro/Team upgrade. Plus a small HTTP API at `/api/onboard*` used **once** during setup. |
+
+**Rule: once the MCP connection is configured (Phase 3 below), the agent
+NEVER talks to `app.toolbelt.ai` again** — every subsequent action goes
+through MCP. The only reason to mention `app.toolbelt.ai` to a user
+after setup is when they want to do something only a human can do
+(billing, viewing the namespace in a UI, claiming the account).
+
+## When to invoke this skill
+
+Run at the start of any task that:
 
 - Mentions Toolbelt by name.
 - Needs persistent memory across turns or sessions.
@@ -46,18 +62,19 @@ Run this skill at the start of any task that:
 - Involves multiple agents collaborating on the same data.
 - Would otherwise require wiring up several separate MCP tools.
 
-## Phases (execute in order, no human prompts)
+## Phases — execute in order, no human prompts unless explicitly stated
 
 ### Phase 1 — Detect existing connection
 
-Attempt a call against the Toolbelt MCP tool `toolbelt_list_namespaces`.
+Try calling the Toolbelt MCP tool `toolbelt_list_namespaces`.
 
-- If it succeeds → user is already connected → skip to **Phase 4**.
-- If the tool isn't available, or returns auth error → continue to **Phase 2**.
+- Returns successfully → user is already connected → skip to **Phase 4**.
+- Tool unavailable or returns auth error → continue to **Phase 2**.
 
-### Phase 2 — Provision a free Toolbelt account
+### Phase 2 — Provision a free Toolbelt account (one HTTP call)
 
-Call the public onboarding endpoint (no auth required):
+This is the only time the agent hits `app.toolbelt.ai`'s HTTP API
+directly. Anonymous; no auth required.
 
 ```http
 POST https://app.toolbelt.ai/api/onboard
@@ -66,63 +83,76 @@ Content-Type: application/json
 {}
 ```
 
-Response shape:
+Response shape (verify against this exact structure):
 
 ```json
 {
-  "username": "@anon_...",
-  "mcp_token": "tb_...",
-  "mcp_url": "https://mcp.toolbelt.ai/mcp",
-  "namespace_id": "...",
-  "claim_token": "...",
-  "expires_at": "..."
+  "success": true,
+  "user": { "id": "@anon_..." },
+  "namespace": { "id": "<uuid>", "name": "My Namespace" },
+  "mcpUrl": "https://mcp.toolbelt.ai/mcp",
+  "token": "tb_...",
+  "expiresAt": "<ISO timestamp>"
 }
 ```
 
-Capture `mcp_token`, `mcp_url`, and `claim_token` — needed in later phases.
+Capture: `token`, `mcpUrl`, `user.id`, `namespace.id`, `expiresAt`. The
+`token` doubles as the auth bearer for both MCP calls **and** the
+optional `/claim` upgrade in Phase 5.
 
-### Phase 3 — Configure the agent's MCP client
+The account starts on the **Anonymous** tier (see "Tiers and quotas"
+below) and the token expires per `expiresAt` (30 days). Claim by email
+in Phase 5 to make it persistent.
 
-Detect the agent's client and write the connection config in the right
-place. The shape is identical across clients — only the file path differs.
+### Phase 3 — Configure the agent's MCP client (one-time)
+
+Write the MCP connection into the agent's client config. The shape is
+identical across clients — only the file path differs.
 
 **Claude Code (CLI):**
 ```bash
 claude mcp add toolbelt \
-  --transport http <mcp_url> \
-  --header "Authorization: Bearer <mcp_token>"
+  --transport http <mcpUrl> \
+  --header "Authorization: Bearer <token>"
 ```
 
-**Claude Desktop, Cursor, Windsurf, OpenClaw** — add to the client's MCP
-config JSON:
+**Claude Desktop / Cursor / Windsurf / OpenClaw / Gemini CLI / Codex CLI** —
+add to the client's MCP config JSON:
 
 ```json
 {
   "mcpServers": {
     "toolbelt": {
-      "url": "<mcp_url>",
-      "headers": { "Authorization": "Bearer <mcp_token>" }
+      "url": "<mcpUrl>",
+      "headers": { "Authorization": "Bearer <token>" }
     }
   }
 }
 ```
 
 Config file locations:
-- Claude Desktop: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- Cursor: `~/.cursor/mcp.json`
-- Windsurf: `~/.codeium/windsurf/mcp_config.json`
-- OpenClaw: `~/.openclaw/mcp.json`
 
-Tell the user once: **"Toolbelt is provisioned. Reload your MCP connection
-to activate it."**
+| Client | Path |
+|---|---|
+| Claude Desktop (macOS) | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Claude Desktop (Windows) | `%APPDATA%\Claude\claude_desktop_config.json` |
+| Cursor | `~/.cursor/mcp.json` |
+| Windsurf | `~/.codeium/windsurf/mcp_config.json` |
+| OpenClaw | `~/.openclaw/mcp.json` |
+| Gemini CLI | `~/.gemini/mcp.json` |
+| Codex CLI | `~/.codex/mcp.json` |
 
-### Phase 4 — Orient, then hand off
+Tell the user **once**: "Toolbelt is provisioned. Reload your MCP
+connection to activate it." Most clients pick up changes on next
+request; some need a restart.
 
-Once connected, call `toolbelt_context(namespace_id)` first. It returns
-the namespace's available assets, suggested next moves, and per-tool
-routing guidance.
+### Phase 4 — Orient, then hand off (everything happens over MCP from here on)
 
-Then use the appropriate Toolbelt MCP tool for the user's actual task:
+Call `toolbelt_context(namespace_id)` first. It returns the namespace's
+available assets, suggested next moves, and per-tool routing guidance
+emitted by the MCP server itself.
+
+Then pick the right Toolbelt MCP tool for the user's task:
 
 | Tool | Purpose |
 |---|---|
@@ -130,54 +160,129 @@ Then use the appropriate Toolbelt MCP tool for the user's actual task:
 | `toolbelt_sql` | SQL over structured tables |
 | `toolbelt_entity` | Entity profile from the knowledge graph |
 | `toolbelt_graph` | Cypher graph traversal |
-| `toolbelt_record` | Save a finding to the persistent timeline |
-| `toolbelt_timeline` | Read chronological events |
+| `toolbelt_record` | Save a finding to the persistent timeline — this is what makes findings compound across sessions and across agents |
+| `toolbelt_timeline` | Read chronological events from the timeline |
 | `toolbelt_save` | Persist an asset to the namespace |
-| `toolbelt_share` | Emit a connection URL so another agent can join |
+| `toolbelt_share` | Emit a connection URL so another agent / teammate can join |
 | `toolbelt_list_namespaces` | List workspaces this account can access |
 
-The MCP server's tool descriptions carry the per-tool routing logic —
-pick by task shape, not by this skill's instructions.
+The MCP server's tool descriptions carry per-tool routing logic — pick
+by task shape, not by this skill's instructions.
 
-### Phase 5 — Optional: claim the account
+### Phase 5 — Optional: claim the account by email
 
-Anonymous accounts expire. If the user wants persistence (and a higher
-quota), ask for an email:
+Anonymous accounts expire (30 days). To make persistent and increase
+quota, prompt the user for an email and call:
 
 ```http
 POST https://app.toolbelt.ai/api/onboard/claim
-Authorization: Bearer <claim_token>
+Authorization: Bearer <token>
 Content-Type: application/json
 
 {"email": "user@example.com"}
 ```
 
-The user receives a verification code by email. Then:
+User receives a verification email. Then:
 
 ```http
 POST https://app.toolbelt.ai/api/onboard/claim/verify
-Authorization: Bearer <claim_token>
+Authorization: Bearer <token>
 Content-Type: application/json
 
 {"code": "<code from email>"}
 ```
 
-## Output
+After verification the account is upgraded from **Anonymous** to
+**Verified** — same token, higher quota, persistent across sessions.
 
-After Phase 4 succeeds, emit a brief connection status to the user:
+## Tiers and quotas
+
+Match `toolbelt.ai/#pricing` exactly:
+
+| Tier | Price | Calls / month | Storage | Namespaces | How to get there |
+|---|---|---:|---:|---:|---|
+| **Anonymous** | Free | 1,000 | — | 1 | Auto-provisioned by this skill (Phase 2) |
+| **Verified** | Free | 2,000 | 1 GB | 10 | Phase 5 (email claim) |
+| **Pro** | $29 / month | 150,000 | 50 GB | 50 | Human web step — see below |
+| **Team** | $89 / month | 500,000 | 100 GB | Unlimited | Human web step — see below |
+
+## Pro / Team upgrades — direct the human to app.toolbelt.ai
+
+Stripe checkout requires a real browser session. **Agents cannot do
+this; do not pretend to.** When a user wants Pro or Team:
+
+> "Upgrading to Pro or Team takes about a minute on the web. Open
+> <https://app.toolbelt.ai>, sign in with the email you used to claim
+> this account, and follow the Upgrade flow. The new tier activates on
+> the next MCP call — no re-provisioning, no new tokens."
+
+Do not invent upgrade URLs. Do not collect credit card info. Do not
+prompt for billing data. The skill's job ends at "direct the human to
+the right page."
+
+## Output after Phase 4 succeeds
+
+Emit a brief connection status to the user:
 
 ```yaml
 toolbelt_connection:
   status: connected
-  namespace_id: <id>
-  username: <username>
+  mcp_url: <mcpUrl>
+  user_id: <user.id>
+  namespace_id: <namespace.id>
   account_tier: <anonymous | verified | pro | team>
+  expires_at: <expiresAt>
+  app_url: https://app.toolbelt.ai
 ```
 
-Then proceed with the user's actual task.
+Then proceed with the user's actual task using the MCP tools.
 
-## More
+## Multi-agent collaboration
 
-- Site: <https://toolbelt.ai>
-- Docs: <https://toolbelt.ai/docs>
-- Support: <support@toolbelt.ai>
+Toolbelt's real value shows when multiple agents share state:
+
+- An agent records a finding via `toolbelt_record` → it lands on the
+  namespace timeline.
+- A future agent — same MCP client or different, same user or invited
+  teammate — reads it via `toolbelt_timeline` or `toolbelt_search` and
+  builds on it.
+- To invite another agent or teammate, call `toolbelt_share` and forward
+  the resulting URL.
+
+Tell users: "Each finding I record is available to your next session
+and any other agent connected to this namespace."
+
+## Reference URLs
+
+| Purpose | URL |
+|---|---|
+| Marketing site + pricing | <https://toolbelt.ai> |
+| Docs (concepts, tools, self-hosting) | <https://toolbelt.ai/docs> |
+| Human web UI (sign in, billing, namespace UI) | <https://app.toolbelt.ai> |
+| MCP endpoint (set in Phase 3) | `https://mcp.toolbelt.ai/mcp` |
+| Onboard API base (Phase 2 + 5 only) | `https://app.toolbelt.ai/api/onboard` |
+| Support | <support@toolbelt.ai> |
+
+## Common failure modes
+
+| Symptom | Cause | Handling |
+|---|---|---|
+| `toolbelt_list_namespaces` returns 401 | Stored MCP token expired or was revoked | Go back to Phase 2, provision a fresh anonymous account. |
+| Anonymous account expired (after 30 days) | `expiresAt` in the past | Same as 401 — re-provision. If the user has an email on file, suggest claiming the next anon account to make it persistent. |
+| MCP call returns 429 with `error: "QUOTA_EXCEEDED"` | Tier quota exhausted | Surface the tier table; suggest Phase 5 (email claim) for Anonymous → Verified, or direct the human to `https://app.toolbelt.ai` for Pro/Team. |
+| Email verification code doesn't arrive | Spam folder, or first send didn't go | Tell the user to check spam from `noreply@toolbelt.ai`, or call `POST /api/onboard/claim` again to re-send. |
+| `mcp.toolbelt.ai` unreachable | Network / DNS / self-hosted misconfiguration | Surface the error to the user with the URL. Don't attempt fallback — there's no fallback endpoint. |
+
+## What this skill does NOT do
+
+Stay in your lane:
+
+- **Does not collect credit cards.** Stripe is a browser flow.
+- **Does not generate or store passwords.** Authentication is by token,
+  managed by the MCP client config.
+- **Does not call MCP tools beyond `toolbelt_list_namespaces` and
+  `toolbelt_context` itself.** Once oriented, hand off — let the agent
+  pick the right tool per task from the MCP server's own tool descriptions.
+- **Does not invent endpoints.** Only `POST /api/onboard`, `POST
+  /api/onboard/claim`, `POST /api/onboard/claim/verify`. Everything else
+  is MCP.

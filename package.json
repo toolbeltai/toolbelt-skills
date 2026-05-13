@@ -1,7 +1,7 @@
 {
   "name": "@toolbeltai/skills",
-  "version": "1.0.3",
-  "description": "Official Toolbelt skills — named /toolbelt-* flows (start, analyze, find, entities, geo, stream, invite) that teach any MCP-capable agent to orchestrate Toolbelt's MCP tools end-to-end.",
+  "version": "1.0.4",
+  "description": "Official Toolbelt skill — one /toolbelt slash command that gives any MCP-capable agent a shared brain for your data. Detects or provisions a free Toolbelt account, configures the MCP connection, and hands off to Toolbelt's MCP tools (vector, knowledge graph, SQL, geospatial, streaming, timeline).",
   "license": "MIT",
   "homepage": "https://toolbelt.ai",
   "repository": {
@@ -31,14 +31,7 @@
   },
   "files": [
     "bin",
-    "assets",
-    "toolbelt-start",
-    "toolbelt-analyze",
-    "toolbelt-find",
-    "toolbelt-entities",
-    "toolbelt-geo",
-    "toolbelt-stream",
-    "toolbelt-invite",
+    "toolbelt",
     "LICENSE",
     "README.md"
   ],

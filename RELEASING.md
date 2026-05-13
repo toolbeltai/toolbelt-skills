@@ -1,105 +1,145 @@
 # Releasing toolbelt-skills
 
-Skills are distributed through **three** channels on every release:
+This repo ships one flagship skill — `toolbelt` — through three channels.
+All three are triggered by a single `package.json` version bump pushed
+to `main`.
 
 | Channel | Consumer | How it gets there |
 |---|---|---|
-| **GitHub tag** | `@toolbeltai/cli` via `giget` | `git tag vX.Y.Z && git push --tags` + GitHub Release |
-| **ClawHub** | OpenClaw users | `.github/workflows/publish.yml` runs on release-published |
-| **Smithery (MCP)** | MCP client directories | Same workflow, same trigger |
-
-The CLI pins a specific tag at build time (see `packages/cli/src/skills/install.ts`
-in the `toolbelt` repo). Users running `npx @toolbeltai/cli` get the exact skills
-version that CLI was tested against — reproducible, upgradeable, revertible.
+| **npm** (`@toolbeltai/skills`) | Toolbelt CLI bundles + standalone installers | `publish-npm.yml` fires on version bump → `npm publish` → git tag pushed |
+| **ClawHub** (`@toolbeltai/toolbelt`) | OpenClaw / Claude Desktop / Cursor / any registry browser | `publish-npm.yml` dispatches `publish.yml` → `clawhub publish --owner toolbeltai --version <skill_ver>` |
+| **Smithery** (MCP server registry) | MCP client directories | `publish.yml` registers `mcp.toolbelt.ai/mcp` with Smithery (gated on `SMITHERY_TOKEN`) |
 
 ## Versioning
 
-There are **two independent versions**, and they intentionally diverge:
+There are **two independent versions**, and they intentionally diverge.
+This isn't a quirk — it's a deliberate choice driven by how npm and
+ClawHub each pin their installs.
 
 | Version | Source of truth | What it tracks |
 |---|---|---|
-| Package version | `package.json` `"version"` | The npm bundle (`@toolbeltai/skills@X.Y.Z`). Bumps on every release of the bundle, regardless of which skills changed. |
-| Per-skill version | each `SKILL.md` top-level `version:` | That specific skill's ClawHub release. Bumps **only when that skill's playbook changes**. |
+| Package version | `package.json` `"version"` | The npm bundle. Bumps on every release of the package. |
+| Per-skill version | `toolbelt/SKILL.md` top-level `version:` | The ClawHub registry version. Bumps only when the skill's playbook materially changes. |
 
 Both are SemVer.
 
 ### Why they're independent
 
 Once a skill is published to ClawHub at e.g. `2.0.0`, semver forbids
-publishing `0.x` of the same slug. Tying every skill's version to the
-package would either (a) force the package to start above the highest
-skill version forever, or (b) force every skill to bump on every package
-release even when nothing in that skill changed. Both are noise.
+publishing `0.x` of the same slug. Forcing the skill version to track
+the package version would either (a) require the package to start above
+the highest skill version forever, or (b) force every skill to bump on
+every package release even when its playbook didn't change. Both are
+noise — keep them independent.
 
-Treat them as separate streams:
+Practical implication: this repo only has one skill today, so the two
+versions look similar in practice. If we ever add a second skill, each
+will track its own ClawHub history independently of the npm package.
 
-- The package version is the **install version** — what a user pins via
-  npm or what the Toolbelt CLI bundles.
-- The per-skill version is the **registry version** — what shows on
-  ClawHub per skill, what a user pins when they install a single skill
-  directly via `clawhub install <slug>@X.Y.Z`.
+### When to bump
 
-### When to bump a `SKILL.md` version
+**Package version (`package.json`)** — *any* release of the bundle:
 
-Only when the skill's behavior or contract changes:
+| Bump | Trigger |
+|---|---|
+| `PATCH` | Doc updates, installer fix, README polish, CI changes |
+| `MINOR` | New skill added/removed, installer feature, backwards-compatible bundle change |
+| `MAJOR` | Installer contract breaks (path layout, command names, env requirements) |
 
-- `PATCH` — wording polish, doc-style edits, no agent-observable change.
-- `MINOR` — new optional inputs/outputs, expanded scope (e.g. single→multi-CSV), backwards-compatible.
-- `MAJOR` — breaking change to inputs/outputs, the skill's playbook is materially different, or the skill was renamed.
+**Per-skill version (`SKILL.md`)** — only when *that skill's playbook*
+changes:
 
-Do **not** bump the per-skill version just because the package version
-moved. If a skill's `SKILL.md` is byte-identical between two releases,
-its version stays the same on both.
+| Bump | Trigger |
+|---|---|
+| `PATCH` | Wording polish, doc-style edits, no agent-observable change |
+| `MINOR` | New optional inputs/outputs, expanded scope, backwards-compatible |
+| `MAJOR` | Breaking change to inputs/outputs, the playbook is materially different, the skill was renamed |
 
-### When to bump the package version
-
-Any release of the bundle:
-
-- `PATCH` — fixes inside the CLI installer, doc updates, one or more
-  skills patched.
-- `MINOR` — new skill added/removed, installer feature, any backwards-compatible bundle change.
-- `MAJOR` — installer contract breaks (path layout, command names, env requirements).
-
-### Publish flow with the two versions
-
-The workflow [`publish.yml`](.github/workflows/publish.yml) extracts each
-skill's own `version:` from its `SKILL.md` and passes it to
-`clawhub publish --version "$SKILL_VER"`. The package version is used
-separately by `publish-npm.yml` for the npm publish + git tag.
+If a skill's `SKILL.md` is byte-identical between two releases, its
+version stays the same on both.
 
 ## Cutting a release
 
-1. Update `CHANGELOG.md` with changes since last tag.
-2. Run validation locally:
+1. Edit `toolbelt/SKILL.md` if the playbook changed. Bump its top-level
+   `version:` per the rules above.
+2. Bump `"version"` in `package.json` per the rules above.
+3. Run validation locally:
    ```bash
    .github/scripts/validate_skills.py
    ```
-3. Tag and push:
+4. Commit and push to `main`:
    ```bash
-   git tag -a v0.1.0 -m "Initial public release"
-   git push origin v0.1.0
+   git commit -am "vX.Y.Z: <one-line summary>"
+   git push
    ```
-4. On GitHub, draft a release from the tag. **Publish** it — the
-   [publish workflow](.github/workflows/publish.yml) fires automatically:
-   - Every skill with a `SKILL.md` is uploaded to ClawHub via `clawhub publish`
-   - The MCP server is registered with Smithery
-5. Bump `SKILLS_REF` in the CLI's `packages/cli/src/skills/install.ts` to the
-   new tag. Cut a matching CLI release (see toolbelt monorepo's own
-   release doc).
+5. That's it. `publish-npm.yml` fires automatically:
+   - Detects the version bump
+   - Publishes `@toolbeltai/skills@vX.Y.Z` to npm
+   - Pushes git tag `vX.Y.Z`
+   - Dispatches `publish.yml` which runs `clawhub publish --owner
+     toolbeltai --version <skill_ver>` for each skill directory under
+     the `@toolbeltai` organization
+   - Calls Smithery if `SMITHERY_TOKEN` is set
 
-## Pre-release / dev
+## Auth
 
-For local development of the CLI against un-released skills, set
-`SKILLS_REF = 'main'` in `install.ts` and re-build. Never publish an npm
-release of `@toolbeltai/cli` with `SKILLS_REF` pointing at a branch.
+`publish-npm.yml`:
+- **Currently** uses `NPM_TOKEN` repo secret (classic auth) because the
+  repo is private — npm's OIDC trusted publishing has inconsistent
+  behavior on private repos.
+- **Once the repo is public**, switch back to OIDC by re-adding
+  `id-token: write` to the workflow's `permissions:` block and removing
+  the `NODE_AUTH_TOKEN` env from the publish step. OIDC + `--provenance`
+  give npm's "verified build" badge for free.
+
+`publish.yml`:
+- Uses `CLAWHUB_TOKEN` repo secret. The workflow runs
+  `clawhub login --token "$CLAWHUB_TOKEN" --no-browser` once before
+  publishing. The token is a personal token from the maintainer who
+  owns the `@toolbeltai` org on ClawHub.
+
+## Monitoring a release
+
+```bash
+gh run list --workflow=publish-npm.yml --limit 3 --repo toolbeltai/toolbelt-skills
+gh run list --workflow=publish.yml --limit 3 --repo toolbeltai/toolbelt-skills
+```
+
+A green pair means npm + ClawHub both succeeded.
+
+## "Version already exists" is fine
+
+If you re-trigger `publish.yml` manually without bumping per-skill
+versions, ClawHub returns `Uncaught ConvexError: Version already
+exists`. This is the registry correctly refusing to overwrite a
+published immutable version — not a failure to act on.
+
+## "Rate limit: 5 new skills per hour"
+
+ClawHub caps initial skill creations at 5/hour. Only the *first* publish
+of a brand-new slug counts. Re-publishing existing slugs at a new
+version is unmetered. If this ever bites us with a new skill rollout,
+wait an hour and re-dispatch.
 
 ## Rolling back
 
-If a release breaks users:
+Skills are immutable once published (semver guarantees). To pull back a
+bad release:
 
-1. Delete the GitHub Release (keeps the tag for the record).
-2. Cut a new patch tag with the fix (e.g. `v0.1.1`).
-3. Publish a new CLI release bumping `SKILLS_REF` to the patch tag.
+1. **npm:** `npm deprecate @toolbeltai/skills@X.Y.Z "reason"`. Deprecated
+   versions still install but emit a warning. Hard deletes only allowed
+   within 72h of publish.
+2. **ClawHub:** `clawhub hide toolbelt` removes the skill from search +
+   browse; existing installs keep working. `clawhub unhide toolbelt`
+   restores it. For a hard pull, `clawhub delete toolbelt`.
+3. **Forward fix:** ship a patch release with the fix. That's the
+   recommended path — roll-forward, not roll-back.
 
-ClawHub and Smithery entries stay at whatever was last published — users
-with the new CLI get the new skills; users on the old CLI are unaffected.
+## Pre-release / dev
+
+For testing workflow changes without affecting the published bundle:
+
+- Edit + push to a feature branch. `publish-npm.yml` only fires on
+  `main` pushes, so branches are safe.
+- Use `gh workflow run publish.yml -f VERSION=v0.X.Y` to manually
+  trigger the ClawHub publish path against a specific tag for testing.
