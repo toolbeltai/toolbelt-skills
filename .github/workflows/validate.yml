@@ -3,6 +3,8 @@ name: Validate Skills
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
 
 jobs:
   validate:
@@ -11,6 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ── Frontmatter + markdown lint ────────────────────────────────
       - uses: astral-sh/setup-uv@v5
 
       - name: Validate SKILL.md files
@@ -25,3 +28,39 @@ jobs:
 
       - name: Lint markdown
         run: markdownlint '**/*.md' --ignore node_modules
+
+      # ── Tarball check: catch packaging bugs before publish ─────────
+      # files: in package.json must point at things that exist AND
+      # ship the actual skill content. Easy to break by deleting a
+      # skill dir without updating files:, or renaming. Fail fast.
+      - name: Verify tarball ships the flagship skill
+        run: |
+          npm pack --dry-run 2>&1 | tee /tmp/pack.out
+          grep -q 'toolbelt/SKILL.md' /tmp/pack.out || {
+            echo "::error::npm pack did not include toolbelt/SKILL.md — check package.json files: array"
+            exit 1
+          }
+
+      # ── Link check: catch URL drift in docs ────────────────────────
+      - name: Check links in markdown
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --max-concurrency 4 --exclude-loopback README.md CONTRIBUTING.md RELEASING.md toolbelt/SKILL.md
+          fail: true
+
+      # ── API smoke: catch atlas onboarding drift ────────────────────
+      # The skill claims a specific response shape from
+      # https://app.toolbelt.ai/api/onboard. If atlas changes that
+      # shape, every new user hits broken onboarding silently. This
+      # creates a real anonymous account each run (auto-expires in
+      # 30d, no cost) and asserts the fields SKILL.md depends on.
+      - name: API smoke — /api/onboard contract
+        run: |
+          response=$(curl -fsS -X POST https://app.toolbelt.ai/api/onboard \
+            -H 'Content-Type: application/json' -d '{}')
+          echo "$response" | jq -e '.token and .mcpUrl and .user.id and .namespace.id and .expiresAt' >/dev/null || {
+            echo "::error::/api/onboard response shape changed — SKILL.md needs updating"
+            echo "$response"
+            exit 1
+          }
+          echo "OK: response shape matches SKILL.md contract"
