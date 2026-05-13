@@ -57,10 +57,18 @@ jobs:
         if: steps.gate.outputs.has_clawhub == 'true'
         run: npm install -g clawhub
 
-      - name: Publish skills to ClawHub
+      # Non-interactive auth — stores token to clawhub's config so the
+      # subsequent `publish` calls find it. The CLI does NOT read
+      # CLAWHUB_TOKEN from env (verified live: first run after wiring the
+      # secret failed every skill with "Not logged in. Run: clawhub login").
+      - name: Login to ClawHub
         if: steps.gate.outputs.has_clawhub == 'true'
         env:
           CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
+        run: clawhub login --token "$CLAWHUB_TOKEN" --no-browser
+
+      - name: Publish skills to ClawHub
+        if: steps.gate.outputs.has_clawhub == 'true'
         run: |
           # Skills in this list are internal dev tools and must not be published.
           SKIP_DIRS="eval-run-toolbelt"
