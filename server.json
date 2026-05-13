@@ -1,0 +1,26 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.toolbeltai/toolbelt",
+  "description": "Toolbelt is a collaborative substrate over your data. Upload any document — entities and relationships extracted automatically, queryable immediately. Ask questions that span structured tables, documents, and relationships in a single call. No stitching databases together. Vector, knowledge graph, SQL, geospatial, streaming through one MCP server. Built by Kinetica.",
+  "version": "1.0.1",
+  "status": "active",
+  "repository": {
+    "url": "https://github.com/toolbeltai/toolbelt-skills",
+    "source": "github"
+  },
+  "websiteUrl": "https://toolbelt.ai",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.toolbelt.ai/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer token from https://app.toolbelt.ai/api/onboard (free anonymous account)",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
