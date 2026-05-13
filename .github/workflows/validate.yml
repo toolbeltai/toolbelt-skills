@@ -29,6 +29,15 @@ jobs:
       - name: Lint markdown
         run: markdownlint '**/*.md' --ignore node_modules
 
+      # ── MCP Registry manifest validation ───────────────────────────
+      # Catches drift in server.json against the official schema —
+      # description length, required fields, transport type, etc.
+      - name: Validate server.json against MCP Registry schema
+        run: |
+          uv tool run check-jsonschema \
+            --schemafile https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json \
+            server.json
+
       # ── Tarball check: catch packaging bugs before publish ─────────
       # files: in package.json must point at things that exist AND
       # ship the actual skill content. Easy to break by deleting a
