@@ -25,11 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write   # tag push requires write
-      # id-token: write deliberately omitted — its presence forces
-      # actions/setup-node to use OIDC publish auth, which fails on
-      # private repos. NPM_TOKEN env (set on the Publish step) is the
-      # auth path. Re-add id-token: write when the repo goes public
-      # and we want OIDC + provenance attestations back.
+      id-token: write   # OIDC for npm trusted publishing (+ provenance)
       actions: write    # dispatch publish.yml — release events from
                         # GITHUB_TOKEN don't trigger downstream workflows,
                         # so we explicitly dispatch via gh workflow run
@@ -62,19 +58,11 @@ jobs:
             echo "→ version unchanged ($CURRENT). Skipping publish."
           fi
 
-      # Auth notes (re-evaluate when the repo goes public):
-      #   - --provenance omitted because npm rejects provenance attestations
-      #     from private source repos.
-      #   - OIDC Trusted Publishing has inconsistent behavior with private
-      #     repos: the trust config saves cleanly on npmjs.com, but the
-      #     publish step gets "OIDC publish authorize: Invalid token" at
-      #     handshake time. Falling back to a classic NPM_TOKEN until the
-      #     repo is public and OIDC works reliably end-to-end.
+      # OIDC trusted publishing — no stored token. --provenance attaches
+      # a verifiable build attestation that npm shows on the package page.
       - name: Publish
         if: steps.version.outputs.changed == 'true'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --access public
+        run: npm publish --access public --provenance
 
       - name: Tag commit
         if: steps.version.outputs.changed == 'true'

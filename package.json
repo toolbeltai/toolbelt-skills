@@ -1,6 +1,6 @@
 {
   "name": "@toolbeltai/skills",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Official Toolbelt skill — one /toolbelt slash command that gives any MCP-capable agent a shared brain for your data. Detects or provisions a free Toolbelt account, configures the MCP connection, and hands off to Toolbelt's MCP tools (vector, knowledge graph, SQL, geospatial, streaming, timeline).",
   "license": "MIT",
   "homepage": "https://toolbelt.ai",
