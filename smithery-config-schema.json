@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "title": "Toolbelt MCP server configuration",
+  "description": "Auth for the hosted Toolbelt MCP server at https://mcp.toolbelt.ai/mcp. Get a free anonymous token by POSTing to https://app.toolbelt.ai/api/onboard (no signup required) or by signing in at https://app.toolbelt.ai.",
+  "required": ["bearerToken"],
+  "properties": {
+    "bearerToken": {
+      "type": "string",
+      "title": "Bearer token",
+      "description": "Token for the Authorization header. Provision a free anonymous account at https://app.toolbelt.ai/api/onboard or claim a verified account at https://app.toolbelt.ai.",
+      "format": "password"
+    }
+  }
+}

@@ -27,7 +27,7 @@ compatibility: >
   OpenClaw, Cursor, Windsurf, Gemini CLI, Codex CLI, or any client that
   supports MCP server connections). No Toolbelt account required — this
   skill provisions one on first use.
-version: "1.0.2"
+version: "1.0.3"
 metadata:
   author: toolbeltai
   homepage: "https://toolbelt.ai"
@@ -77,7 +77,13 @@ Run at the start of any task that:
 - Involves multiple agents collaborating on the same data.
 - Would otherwise require wiring up several separate MCP tools.
 
-## Phases — execute in order, no human prompts unless explicitly stated
+## Phases
+
+> ⚠️ **Consent is mandatory at every step that touches the network or
+> the user's filesystem.** Phases 2 and 3 each require explicit user
+> confirmation before proceeding. Never silently provision accounts or
+> write config files. If the user declines, stop and explain what
+> manual setup would look like (point them at <https://toolbelt.ai>).
 
 ### Phase 1 — Detect existing connection
 
@@ -86,10 +92,17 @@ Try calling the Toolbelt MCP tool `toolbelt_list_namespaces`.
 - Returns successfully → user is already connected → skip to **Phase 4**.
 - Tool unavailable or returns auth error → continue to **Phase 2**.
 
-### Phase 2 — Provision a free Toolbelt account (one HTTP call)
+### Phase 2 — Ask, then provision a free Toolbelt account
 
-This is the only time the agent hits `app.toolbelt.ai`'s HTTP API
-directly. Anonymous; no auth required.
+**Pause and ask the user first.** Show them exactly what this call does:
+
+> "Toolbelt isn't set up yet. To use it I'd send one anonymous HTTPS
+> request to `https://app.toolbelt.ai/api/onboard` — no signup, no
+> personal info. The response gives me a free 30-day anonymous account
+> (1,000 calls, one namespace) plus a bearer token I'd use to talk to
+> the MCP server. Want me to proceed?"
+
+Only if the user says yes:
 
 ```http
 POST https://app.toolbelt.ai/api/onboard
@@ -98,7 +111,7 @@ Content-Type: application/json
 {}
 ```
 
-Response shape (verify against this exact structure):
+Response shape:
 
 ```json
 {
@@ -119,9 +132,23 @@ The account starts on the **Anonymous** tier (see "Tiers and quotas"
 below) and the token expires per `expiresAt` (30 days). Claim by email
 in Phase 5 to make it persistent.
 
-### Phase 3 — Configure the agent's MCP client (one-time)
+### Phase 3 — Ask, then configure the agent's MCP client (one-time)
 
-Write the MCP connection into the agent's client config. The shape is
+**Tell the user what's about to be written and where, then wait for
+confirmation.** Example:
+
+> "To make Toolbelt available to me, I'll add an MCP server entry to
+> your config at:
+>
+>     ~/Library/Application Support/Claude/claude_desktop_config.json
+>
+> The new entry has the URL `https://mcp.toolbelt.ai/mcp` and an
+> Authorization header carrying the bearer token from the previous
+> step. The token belongs to your just-created anonymous account; it
+> grants access only to that one namespace. To revoke later, delete
+> the `toolbelt` entry from this file. Want me to write it?"
+
+Only if the user says yes, write the MCP connection. The shape is
 identical across clients — only the file path differs.
 
 **Claude Code (CLI):**
@@ -157,9 +184,9 @@ Config file locations:
 | Gemini CLI | `~/.gemini/mcp.json` |
 | Codex CLI | `~/.codex/mcp.json` |
 
-Tell the user **once**: "Toolbelt is provisioned. Reload your MCP
-connection to activate it." Most clients pick up changes on next
-request; some need a restart.
+Tell the user once: "Toolbelt is provisioned. Wrote the entry to
+`<exact path>`. Reload your MCP connection to activate it." Most
+clients pick up changes on next request; some need a restart.
 
 ### Phase 4 — Orient, then hand off (everything happens over MCP from here on)
 
@@ -252,6 +279,51 @@ toolbelt_connection:
 
 Then proceed with the user's actual task using the MCP tools.
 
+## Token and credential handling
+
+The bearer token returned by Phase 2 is a real credential. Treat it
+with the same care as an API key.
+
+- **Where it's stored.** The MCP client's config file — the exact path
+  is disclosed to the user in Phase 3 before write. Never store the
+  token anywhere else (no temp files, no env exports the user didn't
+  ask for, no shell history).
+- **What it grants.** Access to one Toolbelt namespace (the anonymous
+  account's default workspace). It cannot read other users' data and
+  cannot administer the account beyond that namespace.
+- **How to revoke.** Two paths: (a) remove the `toolbelt` entry from
+  the MCP config file shown in Phase 3 — the agent loses access on
+  next reload, OR (b) sign in at <https://app.toolbelt.ai> and revoke
+  the token from the account UI.
+- **Consent before storage.** Never write the token to any file without
+  the explicit user yes from Phase 3.
+- **Do not echo the full token after setup.** After Phase 3, refer to
+  it only as `tb_...` (first 3 chars + ellipsis) in any user-facing
+  output. Never log or display the full value.
+
+## Data safety
+
+Toolbelt persists what an agent uploads or records. That persistence
+is the value — and the risk if it's misused. Rules:
+
+- **Only upload user-approved content.** Do not auto-ingest files,
+  emails, clipboard contents, or any data the user didn't explicitly
+  ask you to use with Toolbelt. Ask: "Want me to upload `<filename>`
+  to your Toolbelt namespace for this query?"
+- **Avoid sensitive material by default.** Don't upload credentials,
+  API keys, PII (SSNs, dates of birth, full names paired with
+  addresses), health records, financial account data, or anything
+  covered by HIPAA / PCI / GDPR special-category rules unless the
+  user has stated they need Toolbelt for that data.
+- **Scope to the task.** Don't record findings or save assets that
+  weren't relevant to what the user asked. `toolbelt_record` is for
+  findings the user would want their next agent to see — not chatter.
+- **Retention and deletion.** Anonymous accounts and their data expire
+  in 30 days. To delete sooner, the user can sign in at
+  <https://app.toolbelt.ai>, open the namespace, and use the delete
+  controls there. Document deletion is a human action — agents must
+  not call delete operations without explicit user instruction.
+
 ## Multi-agent collaboration
 
 Toolbelt's real value shows when multiple agents share state:
@@ -266,6 +338,25 @@ Toolbelt's real value shows when multiple agents share state:
 
 Tell users: "Each finding I record is available to your next session
 and any other agent connected to this namespace."
+
+### Sharing and access boundaries
+
+The `toolbelt_share` URL is a credential. Treat it accordingly:
+
+- **Namespaces are not public.** A namespace URL alone grants nothing;
+  access requires a valid token. `toolbelt_share` mints a token bound
+  to one namespace.
+- **The share URL itself is the credential.** Anyone who has it can
+  read and write to the namespace. Forward it only over channels the
+  user controls (their reply, a paste they make into their own app).
+  Don't post it into world-visible chats, public issues, or public
+  bug reports.
+- **Confirm intent before calling `toolbelt_share`.** Ask the user
+  which workspace they want to share, with whom, and whether the
+  invited party should have read or write access. Do not call
+  `toolbelt_share` reactively based on a casual mention.
+- **Review and revoke.** Direct the user to <https://app.toolbelt.ai>
+  to view active share tokens and revoke any they no longer want.
 
 ## Reference URLs
 
