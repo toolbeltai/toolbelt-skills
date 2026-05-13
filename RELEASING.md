@@ -14,12 +14,58 @@ version that CLI was tested against — reproducible, upgradeable, revertible.
 
 ## Versioning
 
-SemVer. Current scheme is flat — one version covers the whole skill set.
+There are **two independent versions**, and they intentionally diverge:
 
-- `PATCH` — wording edits, doc fixes, demo-only asset updates
-- `MINOR` — new skill added, backwards-compatible change to an existing skill
-- `MAJOR` — breaking change to a skill's arguments or output contract, skill
-  renamed or removed
+| Version | Source of truth | What it tracks |
+|---|---|---|
+| Package version | `package.json` `"version"` | The npm bundle (`@toolbeltai/skills@X.Y.Z`). Bumps on every release of the bundle, regardless of which skills changed. |
+| Per-skill version | each `SKILL.md` top-level `version:` | That specific skill's ClawHub release. Bumps **only when that skill's playbook changes**. |
+
+Both are SemVer.
+
+### Why they're independent
+
+Once a skill is published to ClawHub at e.g. `2.0.0`, semver forbids
+publishing `0.x` of the same slug. Tying every skill's version to the
+package would either (a) force the package to start above the highest
+skill version forever, or (b) force every skill to bump on every package
+release even when nothing in that skill changed. Both are noise.
+
+Treat them as separate streams:
+
+- The package version is the **install version** — what a user pins via
+  npm or what the Toolbelt CLI bundles.
+- The per-skill version is the **registry version** — what shows on
+  ClawHub per skill, what a user pins when they install a single skill
+  directly via `clawhub install <slug>@X.Y.Z`.
+
+### When to bump a `SKILL.md` version
+
+Only when the skill's behavior or contract changes:
+
+- `PATCH` — wording polish, doc-style edits, no agent-observable change.
+- `MINOR` — new optional inputs/outputs, expanded scope (e.g. single→multi-CSV), backwards-compatible.
+- `MAJOR` — breaking change to inputs/outputs, the skill's playbook is materially different, or the skill was renamed.
+
+Do **not** bump the per-skill version just because the package version
+moved. If a skill's `SKILL.md` is byte-identical between two releases,
+its version stays the same on both.
+
+### When to bump the package version
+
+Any release of the bundle:
+
+- `PATCH` — fixes inside the CLI installer, doc updates, one or more
+  skills patched.
+- `MINOR` — new skill added/removed, installer feature, any backwards-compatible bundle change.
+- `MAJOR` — installer contract breaks (path layout, command names, env requirements).
+
+### Publish flow with the two versions
+
+The workflow [`publish.yml`](.github/workflows/publish.yml) extracts each
+skill's own `version:` from its `SKILL.md` and passes it to
+`clawhub publish --version "$SKILL_VER"`. The package version is used
+separately by `publish-npm.yml` for the npm publish + git tag.
 
 ## Cutting a release
 

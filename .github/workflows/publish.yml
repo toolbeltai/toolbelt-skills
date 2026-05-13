@@ -80,10 +80,11 @@ jobs:
               continue
             fi
             if [ -f "$dir/SKILL.md" ]; then
-              # Extract version from SKILL.md frontmatter; fall back to a default if absent.
-              # clawhub publish auto-derives --version internally but our values
-              # (e.g. "2.0" with implicit ".0") don't pass its semver check, so
-              # we pass --version explicitly.
+              # Each skill's version is independent of the npm package
+              # version — see RELEASING.md "Versioning". Read the top-level
+              # `version:` from this skill's SKILL.md and pass it explicitly.
+              # clawhub publish auto-detects a version otherwise and rejects
+              # anything that doesn't parse as full semver.
               SKILL_VER=$(awk '/^version: /{gsub(/"/, "", $2); print $2; exit}' "$dir/SKILL.md")
               [ -z "$SKILL_VER" ] && SKILL_VER="1.0.0"
               echo "Publishing $dir (version $SKILL_VER)..."

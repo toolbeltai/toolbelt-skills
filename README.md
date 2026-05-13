@@ -52,6 +52,13 @@ npx @toolbeltai/skills list          # list what would be installed
 npx @toolbeltai/skills path          # print install target
 ```
 
+## Versioning
+
+The npm package version (`@toolbeltai/skills@X.Y.Z`) and each skill's
+ClawHub version (`SKILL.md` top-level `version:`) are **independent** and
+bumped separately — see [RELEASING.md](./RELEASING.md#versioning) for the
+full rule. TL;DR: only bump a skill's version when *that skill* changes.
+
 ## Docs
 
 - Skill reference: <https://docs.toolbelt.ai>
