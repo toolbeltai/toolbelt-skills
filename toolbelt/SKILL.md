@@ -1,18 +1,21 @@
 ---
 name: toolbelt
 description: >
-  Toolbelt is a collaborative substrate for your agents — one shared brain
-  for your data. Connect AI agents to vector search, knowledge graph, SQL,
-  geospatial, and streaming data through one MCP server. Findings,
-  decisions, and observations persist across sessions and across agents.
+  Toolbelt is the agentic data layer. Connect Claude, Cursor, ChatGPT,
+  and other AI agents to your structured and unstructured data through a
+  single MCP server — vector, knowledge graph, SQL, geospatial,
+  streaming. Built by Kinetica. Toolbelt is a collaborative substrate
+  over your data: discover documents, structured data, events, entities,
+  and relationships across agents and sessions. Better answers. Fewer
+  tokens. Curated context, not raw access.
 
   Use this skill at the start of any task where an agent needs persistent
   memory across sessions, natural-language access to structured or
-  unstructured data, or shared state with other agents working on the same
-  data. The skill handles first-time setup: provisions a free Toolbelt
-  account if none exists, configures the MCP connection in the agent's
-  client, optionally upgrades the account by email, and hands off to
-  Toolbelt's MCP tools for the actual work.
+  unstructured data, or shared state with other agents working on the
+  same data. The skill handles first-time setup: provisions a free
+  Toolbelt account if none exists, configures the MCP connection in the
+  agent's client, optionally upgrades the account by email, and hands off
+  to Toolbelt's MCP tools for the actual work.
 
   NOT for one-off lookups that don't benefit from persistent memory or
   structured data — use the agent's native tools for those.
@@ -32,9 +35,9 @@ metadata:
 
 **Your data. Your agents. One shared brain.**
 
-Toolbelt connects AI agents to vector search, knowledge graph, SQL,
-geospatial, and streaming data through one MCP server. Findings,
-decisions, and observations persist across sessions and across agents.
+Toolbelt is a collaborative substrate over your data. Discover documents,
+structured data, events, entities, and relationships across agents and
+sessions. Better answers. Fewer tokens. Curated context, not raw access.
 
 ## Two surfaces — keep them straight
 
