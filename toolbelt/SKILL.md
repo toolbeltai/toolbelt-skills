@@ -198,7 +198,7 @@ Then pick the right Toolbelt MCP tool for the user's task:
 
 | Tool | Purpose |
 |---|---|
-| `toolbelt_search` | Vector RAG over documents |
+| `toolbelt_search` | Hybrid retrieval (vector + SQL + graph) — routes per question |
 | `toolbelt_sql` | SQL over structured tables |
 | `toolbelt_entity` | Entity profile from the knowledge graph |
 | `toolbelt_graph` | Cypher graph traversal |
