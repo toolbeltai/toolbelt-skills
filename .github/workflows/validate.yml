@@ -77,7 +77,10 @@ jobs:
       - name: Check links in markdown
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --max-concurrency 4 --exclude-loopback README.md CONTRIBUTING.md RELEASING.md toolbelt/SKILL.md
+          # npmjs.com 403s link-checker bots (verified: the package page loads
+          # fine and `npm view` resolves) — exclude it rather than fail on
+          # anti-bot noise.
+          args: --no-progress --max-concurrency 4 --exclude-loopback --exclude 'npmjs\.com' README.md CONTRIBUTING.md RELEASING.md toolbelt/SKILL.md
           fail: true
 
       # ── API smoke: catch atlas onboarding drift ────────────────────
