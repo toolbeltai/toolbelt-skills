@@ -26,6 +26,41 @@ on:
         required: true
 
 jobs:
+  # ── MCP Official Registry ──────────────────────────────────────────
+  # Publishes server.json to registry.modelcontextprotocol.io under the
+  # io.github.toolbeltai/* namespace. Auth is GitHub OIDC — no secret
+  # needed; namespace ownership is proven by running in the toolbeltai
+  # org. Separate job so a registry hiccup never blocks ClawHub/Smithery.
+  mcp-registry:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # OIDC for mcp-publisher login github-oidc
+      contents: read
+    steps:
+      - name: Resolve version
+        id: v
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ inputs.VERSION }}" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.v.outputs.tag }}
+
+      - name: Install mcp-publisher
+        run: |
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/').tar.gz" \
+            | tar xz mcp-publisher
+          sudo mv mcp-publisher /usr/local/bin/
+
+      - name: Publish to MCP Registry
+        run: |
+          mcp-publisher login github-oidc
+          mcp-publisher publish
+
   publish:
     runs-on: ubuntu-latest
     steps:
