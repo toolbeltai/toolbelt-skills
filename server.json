@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
   "name": "io.github.toolbeltai/toolbelt",
   "description": "A collaborative substrate over your data: vector, knowledge graph, SQL, geospatial, streaming.",
-  "version": "1.0.1",
+  "version": "1.0.13",
   "status": "active",
   "repository": {
     "url": "https://github.com/toolbeltai/toolbelt-skills",

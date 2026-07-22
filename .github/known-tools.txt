@@ -1,0 +1,32 @@
+# Registered MCP tools — must match register() calls in
+# toolbelt/mcp/toolbelt_mcp/tools.py (the private product repo).
+# CI fails if SKILL.md references a toolbelt_* name not in this list.
+# When the server adds/renames a tool, update this file in the same PR
+# that updates SKILL.md.
+toolbelt_accept_share
+toolbelt_add_public_asset
+toolbelt_ask
+toolbelt_connect
+toolbelt_context
+toolbelt_create_data_source
+toolbelt_create_namespace
+toolbelt_describe
+toolbelt_entity
+toolbelt_graph
+toolbelt_jobs
+toolbelt_kg_ontology
+toolbelt_kg_ontology_set
+toolbelt_lesson
+toolbelt_lesson_propose
+toolbelt_list
+toolbelt_list_data_sources
+toolbelt_list_namespaces
+toolbelt_list_public_assets
+toolbelt_record
+toolbelt_register_asset
+toolbelt_save
+toolbelt_share
+toolbelt_sql
+toolbelt_timeline
+toolbelt_usage
+toolbelt_vectors

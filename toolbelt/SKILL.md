@@ -27,7 +27,7 @@ compatibility: >
   OpenClaw, Cursor, Windsurf, Gemini CLI, Codex CLI, or any client that
   supports MCP server connections). No Toolbelt account required — this
   skill provisions one on first use.
-version: "1.0.3"
+version: "1.0.13"
 metadata:
   author: toolbeltai
   homepage: "https://toolbelt.ai"
@@ -198,11 +198,13 @@ Then pick the right Toolbelt MCP tool for the user's task:
 
 | Tool | Purpose |
 |---|---|
-| `toolbelt_search` | Vector RAG over documents |
-| `toolbelt_sql` | SQL over structured tables |
+| `toolbelt_ask` | **Start here for questions.** Hybrid retrieval across SQL, documents, and the knowledge graph in one call — the server routes the question, so you don't have to pick the right shape |
+| `toolbelt_vectors` | Vector similarity search over documents (when you specifically want semantic doc search) |
+| `toolbelt_sql` | SQL over structured tables (when you already know the exact query) |
 | `toolbelt_entity` | Entity profile from the knowledge graph |
 | `toolbelt_graph` | Cypher graph traversal |
 | `toolbelt_record` | Save a finding to the persistent timeline — this is what makes findings compound across sessions and across agents |
+| `toolbelt_lesson_propose` | Propose reusable guidance as a draft the workspace owner approves — for rules that should shape future agents, not one-off facts |
 | `toolbelt_timeline` | Read chronological events from the timeline |
 | `toolbelt_save` | Persist an asset to the namespace |
 | `toolbelt_share` | Emit a connection URL so another agent / teammate can join |
@@ -267,8 +269,8 @@ the right page."
 Emit a brief connection status to the user:
 
 ```yaml
-toolbelt_connection:
-  status: connected
+connection_status:
+  toolbelt: connected
   mcp_url: <mcpUrl>
   user_id: <user.id>
   namespace_id: <namespace.id>
@@ -331,8 +333,11 @@ Toolbelt's real value shows when multiple agents share state:
 - An agent records a finding via `toolbelt_record` → it lands on the
   namespace timeline.
 - A future agent — same MCP client or different, same user or invited
-  teammate — reads it via `toolbelt_timeline` or `toolbelt_search` and
+  teammate — reads it via `toolbelt_timeline` or `toolbelt_ask` and
   builds on it.
+- When the user confirms a rule worth keeping ("always X", "never Y"),
+  propose it via `toolbelt_lesson_propose` — the owner approves it once,
+  and every future agent on the namespace receives it as guidance.
 - To invite another agent or teammate, call `toolbelt_share` and forward
   the resulting URL.
 
@@ -364,6 +369,7 @@ The `toolbelt_share` URL is a credential. Treat it accordingly:
 |---|---|
 | Marketing site + pricing | <https://toolbelt.ai> |
 | Docs (concepts, tools, self-hosting) | <https://toolbelt.ai/docs> |
+| Complete docs as one markdown file (agent-readable) | <https://toolbelt.ai/llms-full.txt> |
 | Human web UI (sign in, billing, namespace UI) | <https://app.toolbelt.ai> |
 | MCP endpoint (set in Phase 3) | `https://mcp.toolbelt.ai/mcp` |
 | Onboard API base (Phase 2 + 5 only) | `https://app.toolbelt.ai/api/onboard` |

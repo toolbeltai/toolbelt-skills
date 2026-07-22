@@ -29,6 +29,25 @@ jobs:
       - name: Lint markdown
         run: markdownlint '**/*.md' --ignore node_modules
 
+      # ── Tool-surface drift guard ───────────────────────────────────
+      # Every toolbelt_* name mentioned in SKILL.md must be a real
+      # registered MCP tool (allowlist in .github/known-tools.txt).
+      # This is the check that would have caught the stale
+      # `toolbelt_search` reference.
+      - name: Verify tool names against known tool surface
+        run: |
+          mentioned=$(grep -ohE 'toolbelt_[a-z_]+' toolbelt/SKILL.md | sort -u)
+          unknown=""
+          for t in $mentioned; do
+            grep -qx "$t" .github/known-tools.txt || unknown="$unknown $t"
+          done
+          if [ -n "$unknown" ]; then
+            echo "::error::SKILL.md references unknown tool(s):$unknown"
+            echo "Either fix the reference or (if the server really added the tool) add it to .github/known-tools.txt"
+            exit 1
+          fi
+          echo "All $(echo "$mentioned" | wc -l | tr -d ' ') mentioned tool names are registered tools."
+
       # ── MCP Registry manifest validation ───────────────────────────
       # Catches drift in server.json against the official schema —
       # description length, required fields, transport type, etc.
