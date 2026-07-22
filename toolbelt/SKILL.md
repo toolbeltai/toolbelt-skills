@@ -27,7 +27,7 @@ compatibility: >
   OpenClaw, Cursor, Windsurf, Gemini CLI, Codex CLI, or any client that
   supports MCP server connections). No Toolbelt account required — this
   skill provisions one on first use.
-version: "1.0.13"
+version: "1.0.14"
 metadata:
   author: toolbeltai
   homepage: "https://toolbelt.ai"

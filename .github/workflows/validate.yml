@@ -58,7 +58,7 @@ jobs:
       - name: Validate server.json against MCP Registry schema
         run: |
           uv tool run check-jsonschema \
-            --schemafile https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json \
+            --schemafile https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json \
             server.json
 
       # ── Tarball check: catch packaging bugs before publish ─────────
