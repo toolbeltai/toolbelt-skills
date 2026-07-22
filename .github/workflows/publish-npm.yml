@@ -21,7 +21,14 @@ on:
       - '.github/workflows/publish-npm.yml'
 
 jobs:
+  # Publishing is gated on the full validation suite. Before this gate,
+  # v1.0.13 shipped to npm while Validate Skills was failing on the same
+  # commit — never again.
+  validate:
+    uses: ./.github/workflows/validate.yml
+
   publish:
+    needs: validate
     runs-on: ubuntu-latest
     permissions:
       contents: write   # tag push requires write

@@ -55,7 +55,9 @@ jobs:
       # ── ClawHub ──────────────────────────────────────────────────────
       - name: Install clawhub CLI
         if: steps.gate.outputs.has_clawhub == 'true'
-        run: npm install -g clawhub
+        # Pinned: unpinned latest broke this workflow when 0.23.x removed
+        # the --clawscan-note flag (usage dump + exit 1). Bump deliberately.
+        run: npm install -g clawhub@0.23.1
 
       # Non-interactive auth — stores token to clawhub's config so the
       # subsequent `publish` calls find it. The CLI does NOT read
@@ -83,21 +85,14 @@ jobs:
               [ -z "$SKILL_VER" ] && SKILL_VER="1.0.0"
               echo "Publishing $dir (version $SKILL_VER)..."
               outfile=$(mktemp)
-              # Clawscan note gives the ClawHub security scanner context
-              # for behaviors it would otherwise flag as suspicious:
-              # - Calls one public unauthenticated HTTP endpoint to
-              #   provision a free Toolbelt account.
-              # - Writes the resulting MCP-server URL + bearer token to
-              #   the user's agent client config (Claude Desktop / Cursor
-              #   / etc. config JSON). Same thing the official
-              #   @toolbeltai/cli does. Token belongs to the just-created
-              #   anonymous account scoped to one namespace.
-              CLAWSCAN_NOTE='Onboarding playbook for Toolbelt (https://toolbelt.ai). Performs two privileged actions, both consent-gated with explicit user confirmation per phase: (1) HTTPS POST to https://app.toolbelt.ai/api/onboard to provision a free anonymous Toolbelt account (no auth required); (2) writes the returned MCP server URL plus the new anonymous bearer token into the user agent client MCP config. The skill discloses the exact config path to the user before writing and never proceeds without an explicit yes. Includes sections on token storage and revocation, data safety (no auto-uploads, scope to task), and sharing boundaries (toolbelt_share URL is treated as a credential, confirmed before issue). Same flow as the official @toolbeltai/cli npm package. Source: https://github.com/toolbeltai/toolbelt-skills.'
               # bash -eo pipefail is the default GH Actions shell; the
               # `if (subshell); then` form is the only pattern that
               # cleanly captures both the exit code AND the output of a
               # failing command without tripping errexit.
-              if (cd "$dir" && clawhub publish --owner toolbeltai --version "$SKILL_VER" --clawscan-note "$CLAWSCAN_NOTE" . >"$outfile" 2>&1); then
+              # NOTE: --clawscan-note was removed from the clawhub CLI in 0.23.x.
+              # The consent/security context lives in SKILL.md itself now; pass a
+              # plain changelog line instead.
+              if (cd "$dir" && clawhub publish --owner toolbeltai --version "$SKILL_VER" --changelog "See https://github.com/toolbeltai/toolbelt-skills/commits/main" . >"$outfile" 2>&1); then
                 echo "✓ $dir published to ClawHub"
               elif grep -q "Version already exists" "$outfile"; then
                 echo "= $dir already at $SKILL_VER (no-op)"
@@ -114,7 +109,9 @@ jobs:
       # ── Smithery (MCP server registry — indexes mcp.toolbelt.ai) ─────
       - name: Install Smithery CLI
         if: steps.gate.outputs.has_smithery == 'true'
-        run: npm install -g @smithery/cli
+        # Pinned for the same reason as clawhub: registry CLIs change flags
+        # between releases. Bump deliberately.
+        run: npm install -g @smithery/cli@4.11.1
 
       - name: Publish MCP server to Smithery
         if: steps.gate.outputs.has_smithery == 'true'

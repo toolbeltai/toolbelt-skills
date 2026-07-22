@@ -64,14 +64,18 @@ version stays the same on both.
    `version:` per the rules above.
 2. Bump `"version"` in `package.json` per the rules above.
 3. Run validation locally:
+
    ```bash
    .github/scripts/validate_skills.py
    ```
+
 4. Commit and push to `main`:
+
    ```bash
    git commit -am "vX.Y.Z: <one-line summary>"
    git push
    ```
+
 5. That's it. `publish-npm.yml` fires automatically:
    - Detects the version bump
    - Publishes `@toolbeltai/skills@vX.Y.Z` to npm
@@ -84,6 +88,7 @@ version stays the same on both.
 ## Auth
 
 `publish-npm.yml`:
+
 - **Currently** uses `NPM_TOKEN` repo secret (classic auth) because the
   repo is private — npm's OIDC trusted publishing has inconsistent
   behavior on private repos.
@@ -93,6 +98,7 @@ version stays the same on both.
   give npm's "verified build" badge for free.
 
 `publish.yml`:
+
 - Uses `CLAWHUB_TOKEN` repo secret. The workflow runs
   `clawhub login --token "$CLAWHUB_TOKEN" --no-browser` once before
   publishing. The token is a personal token from the maintainer who

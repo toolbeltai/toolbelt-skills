@@ -138,10 +138,8 @@ in Phase 5 to make it persistent.
 confirmation.** Example:
 
 > "To make Toolbelt available to me, I'll add an MCP server entry to
-> your config at:
->
->     ~/Library/Application Support/Claude/claude_desktop_config.json
->
+> your config at
+> `~/Library/Application Support/Claude/claude_desktop_config.json`.
 > The new entry has the URL `https://mcp.toolbelt.ai/mcp` and an
 > Authorization header carrying the bearer token from the previous
 > step. The token belongs to your just-created anonymous account; it
@@ -152,6 +150,7 @@ Only if the user says yes, write the MCP connection. The shape is
 identical across clients — only the file path differs.
 
 **Claude Code (CLI):**
+
 ```bash
 claude mcp add toolbelt \
   --transport http <mcpUrl> \

@@ -12,7 +12,7 @@ the discovery + onboarding layer.
 
 ## Repo layout
 
-```
+```text
 toolbelt-skills/
 ├── toolbelt/SKILL.md         # the flagship skill
 ├── bin/install.js            # standalone npm installer
