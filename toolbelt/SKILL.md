@@ -27,7 +27,7 @@ compatibility: >
   OpenClaw, Cursor, Windsurf, Gemini CLI, Codex CLI, or any client that
   supports MCP server connections). No Toolbelt account required — this
   skill provisions one on first use.
-version: "1.0.14"
+version: "1.1.0"
 metadata:
   author: toolbeltai
   homepage: "https://toolbelt.ai"
@@ -204,8 +204,11 @@ Then pick the right Toolbelt MCP tool for the user's task:
 | `toolbelt_graph` | Cypher graph traversal |
 | `toolbelt_record` | Save a finding to the persistent timeline — this is what makes findings compound across sessions and across agents |
 | `toolbelt_lesson_propose` | Propose reusable guidance as a draft the workspace owner approves — for rules that should shape future agents, not one-off facts |
+| `toolbelt_knowledge` | Read the governed knowledge model: approved business terms, definitions, ownership, and how they bind to tables and documents (`format="mermaid"` for a diagram) |
+| `toolbelt_knowledge_propose` | Propose a governed fact — a definition, ownership, or a correction to a wrong extracted edge — as a draft the workspace owner approves |
 | `toolbelt_timeline` | Read chronological events from the timeline |
 | `toolbelt_save` | Persist an asset to the namespace |
+| `toolbelt_register_table` | Register a table that already exists in Kinetica into the namespace, without re-ingesting it |
 | `toolbelt_share` | Emit a connection URL so another agent / teammate can join |
 | `toolbelt_list_namespaces` | List workspaces this account can access |
 

@@ -16,6 +16,8 @@ toolbelt_graph
 toolbelt_jobs
 toolbelt_kg_ontology
 toolbelt_kg_ontology_set
+toolbelt_knowledge
+toolbelt_knowledge_propose
 toolbelt_lesson
 toolbelt_lesson_propose
 toolbelt_list
@@ -24,6 +26,7 @@ toolbelt_list_namespaces
 toolbelt_list_public_assets
 toolbelt_record
 toolbelt_register_asset
+toolbelt_register_table
 toolbelt_save
 toolbelt_share
 toolbelt_sql

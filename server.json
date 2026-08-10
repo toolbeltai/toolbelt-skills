@@ -3,7 +3,7 @@
   "name": "io.github.toolbeltai/toolbelt",
   "title": "Toolbelt",
   "description": "A collaborative substrate over your data: vector, knowledge graph, SQL, geospatial, streaming.",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "repository": {
     "url": "https://github.com/toolbeltai/toolbelt-skills",
     "source": "github"
