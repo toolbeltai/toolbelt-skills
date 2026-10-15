@@ -208,6 +208,8 @@ Then pick the right Toolbelt MCP tool for the user's task:
 | `toolbelt_knowledge_propose` | Propose a governed fact — a definition, ownership, or a correction to a wrong extracted edge — as a draft the workspace owner approves |
 | `toolbelt_timeline` | Read chronological events from the timeline |
 | `toolbelt_save` | Persist an asset to the namespace |
+| `toolbelt_jobs` | With `view="upload"`: how a bulk upload is going — files ready, skipped (with reasons), needing attention, still queued, and an estimate of time left |
+| `toolbelt_ingest_control` | Act on an upload in bulk: `action="cancel_queued"` (stop files not started yet), `"retry"` (files that need attention), `"restart_stuck"` (files left mid-processing). Check `toolbelt_jobs(view="upload")` first |
 | `toolbelt_register_table` | Register a table that already exists in Kinetica into the namespace, without re-ingesting it |
 | `toolbelt_share` | Emit a connection URL so another agent / teammate can join |
 | `toolbelt_list_namespaces` | List workspaces this account can access |
