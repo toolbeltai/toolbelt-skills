@@ -19,6 +19,9 @@ on:
       - 'bin/**'
       - '**/SKILL.md'
       - '.github/workflows/publish-npm.yml'
+  # Started by sync-tools.yml after it pushes a synced tool table (its
+  # GITHUB_TOKEN push doesn't trigger the push event above).
+  workflow_dispatch:
 
 jobs:
   # Publishing is gated on the full validation suite. Before this gate,

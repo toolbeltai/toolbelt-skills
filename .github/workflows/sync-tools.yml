@@ -1,0 +1,48 @@
+name: Sync tools from the live server
+
+# Keeps toolbelt/SKILL.md's tool table in step with what mcp.toolbelt.ai actually
+# exposes, so every channel (npm, ClawHub, MCP Registry, Smithery) carries the
+# current tools without anyone remembering to edit the skill.
+#
+# Hourly: one GET of the prod version; nothing else runs unless prod released.
+# On a change: rewrite the table, bump package/server.json/skill patch versions,
+# push to main, then start publish-npm.yml (a push made with GITHUB_TOKEN doesn't
+# trigger workflows; a dispatch does).
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: sync-tools
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # push the synced SKILL.md + version bump
+      actions: write    # start publish-npm.yml
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Sync the tool table
+        id: sync
+        run: python3 -I .github/scripts/sync_tools.py
+
+      - name: Commit and push
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "v${{ steps.sync.outputs.version }}: tool table synced from Toolbelt ${{ steps.sync.outputs.server }}"
+          git push origin HEAD:main
+
+      - name: Publish
+        if: steps.sync.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run publish-npm.yml --ref main

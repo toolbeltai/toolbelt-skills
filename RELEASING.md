@@ -10,6 +10,16 @@ to `main`.
 | **ClawHub** (`@toolbeltai/toolbelt`) | OpenClaw / Claude Desktop / Cursor / any registry browser | `publish-npm.yml` dispatches `publish.yml` → `clawhub publish --owner toolbeltai --version <skill_ver>` |
 | **Smithery** (MCP server registry) | MCP client directories | `publish.yml` registers `mcp.toolbelt.ai/mcp` with Smithery (gated on `SMITHERY_TOKEN`) |
 
+## Tool table: synced automatically
+
+The tool table in `toolbelt/SKILL.md` (between `<!-- tools:begin -->` and
+`<!-- tools:end -->`) is generated from the live server, not edited by hand.
+`sync-tools.yml` checks the prod Toolbelt version every hour; after a Toolbelt
+release it reads the server's tools, rewrites the table, bumps the patch
+versions (package, server.json, skill) and starts `publish-npm.yml`, which ships
+to every channel above. To change a tool's line, change its description in the
+MCP server. Run `.github/scripts/sync_tools.py` locally to sync by hand.
+
 ## Versioning
 
 There are **two independent versions**, and they intentionally diverge.
