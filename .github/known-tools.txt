@@ -1,8 +1,6 @@
-# Registered MCP tools — must match register() calls in
-# toolbelt/mcp/toolbelt_mcp/tools.py (the private product repo).
-# CI fails if SKILL.md references a toolbelt_* name not in this list.
-# When the server adds/renames a tool, update this file in the same PR
-# that updates SKILL.md.
+# Registered MCP tools, as the live server lists them (tools/list on mcp.toolbelt.ai).
+# Written by .github/scripts/sync_tools.py; CI fails if SKILL.md names a toolbelt_*
+# tool that isn't here.
 toolbelt_accept_share
 toolbelt_add_public_asset
 toolbelt_ask
@@ -13,6 +11,7 @@ toolbelt_create_namespace
 toolbelt_describe
 toolbelt_entity
 toolbelt_graph
+toolbelt_ingest_control
 toolbelt_jobs
 toolbelt_kg_ontology
 toolbelt_kg_ontology_set
@@ -22,12 +21,21 @@ toolbelt_lesson
 toolbelt_lesson_propose
 toolbelt_list
 toolbelt_list_data_sources
+toolbelt_list_functions
 toolbelt_list_namespaces
 toolbelt_list_public_assets
+toolbelt_list_recipes
+toolbelt_list_saved_queries
+toolbelt_map
+toolbelt_recipe
+toolbelt_recipe_status
 toolbelt_record
 toolbelt_register_asset
 toolbelt_register_table
+toolbelt_run_function
 toolbelt_save
+toolbelt_saved_query
+toolbelt_series
 toolbelt_share
 toolbelt_sql
 toolbelt_timeline

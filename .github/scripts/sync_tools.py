@@ -3,7 +3,7 @@
 
 Reads the tools the server actually exposes (anonymous account via /api/onboard,
 then MCP initialize + tools/list) and rewrites the block between the markers in
-toolbelt/SKILL.md. When the block changes, bumps the patch version of the npm
+toolbelt/SKILL.md and .github/known-tools.txt. When either changes, bumps the patch version of the npm
 package, server.json and the skill, so publish-npm.yml ships it everywhere.
 
     sync_tools.py              # rewrite + bump when the server changed
@@ -25,6 +25,11 @@ ROOT = Path(__file__).resolve().parents[2]
 SKILL = ROOT / "toolbelt" / "SKILL.md"
 PACKAGE = ROOT / "package.json"
 SERVER_JSON = ROOT / "server.json"
+KNOWN_TOOLS = ROOT / ".github" / "known-tools.txt"
+KNOWN_HEADER = """# Registered MCP tools, as the live server lists them (tools/list on mcp.toolbelt.ai).
+# Written by .github/scripts/sync_tools.py; CI fails if SKILL.md names a toolbelt_*
+# tool that isn't here.
+"""
 BEGIN = "<!-- tools:begin"
 END = "<!-- tools:end -->"
 SYNCED = re.compile(r"Synced from the live server \(Toolbelt (\S+)\)")
@@ -111,14 +116,17 @@ def main():
         output(changed="false")
         return
 
-    new_block = render(live_tools(), server_version)
-    if new_block == block:
+    tools = live_tools()
+    known = KNOWN_HEADER + "".join(f"{n}\n" for n in sorted(t["name"] for t in tools))
+    new_block = render(tools, server_version)
+    if new_block == block and known == KNOWN_TOOLS.read_text():
         print("no change")
         output(changed="false")
         return
     if check:
         raise SystemExit(f"SKILL.md tool table is behind the live server (Toolbelt {server_version}); run sync_tools.py")
 
+    KNOWN_TOOLS.write_text(known)
     skill = skill[:start] + new_block + skill[end + len(END):]
     skill = re.sub(r'^version: "(\d+\.\d+\.\d+)"', lambda m: f'version: "{bump(m.group(1))}"', skill, count=1,
                    flags=re.M)
