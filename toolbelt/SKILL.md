@@ -377,6 +377,39 @@ Toolbelt's real value shows when multiple agents share state:
 - To invite another agent or teammate, call `toolbelt_share` and forward
   the resulting URL.
 
+When several agents work on the same namespace at the same time
+(Toolbelt v0.2.94 and later):
+
+- **Split work with `toolbelt_task`.** `operation='create'` adds a task
+  (title, optional payload, queue, priority). `operation='claim'` hands the
+  next open task to exactly one agent under a lease and returns a
+  `claim_token`. Use `heartbeat` before `lease_until` on long work, then
+  `complete` with the token and status `done` or `failed`. A lease that
+  runs out returns the task to the queue; `lease_lost` means stop. `list`
+  shows who holds what, but reserves nothing: claim before working.
+  Server-side upload and ingest progress stays in `toolbelt_jobs`.
+- **Share small values with `toolbelt_state`.** A versioned JSON value per
+  key (a plan, a counter, a lock, a checkpoint) with `get`, `put`,
+  `delete` and `list`. To change a value without overwriting another
+  agent's write, `get` it, then `put` with `if_version=<version>`; on
+  `version_conflict`, apply the change to the returned `current` value and
+  put again. `if_version=0` creates the key only if it doesn't exist (a
+  lock). Notes for people still go to `toolbelt_record`.
+- **Wait instead of polling.** `toolbelt_timeline` with `wait_seconds`
+  (up to 55) blocks until the next change and returns at once if one is
+  already there. `kinds` narrows it to `timeline`, `task` or `state`
+  changes. Call again with `after=<next_cursor>` to get each change once.
+  Plain `after=<cursor>` (no wait) tails the timeline oldest-first, and
+  `agent=<id>` shows what one agent wrote.
+- **Retries are safe.** `toolbelt_record`, `toolbelt_save`, the task and
+  state writes and the propose tools accept an `idempotency_key`: send the
+  same key on every retry of the same call, and a repeat within 24 hours
+  returns the first answer instead of writing twice.
+- **Name your agents.** Rows record which agent wrote them (`agent_id`,
+  `client_name`). An agent identifies itself with the
+  `X-Toolbelt-Agent` header in its MCP client config, or the client name
+  it sends when it connects.
+
 Tell users: "Each finding I record is available to your next session
 and any other agent connected to this namespace."
 
