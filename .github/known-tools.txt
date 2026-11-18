@@ -38,6 +38,8 @@ toolbelt_saved_query
 toolbelt_series
 toolbelt_share
 toolbelt_sql
+toolbelt_state
+toolbelt_task
 toolbelt_timeline
 toolbelt_usage
 toolbelt_vectors
